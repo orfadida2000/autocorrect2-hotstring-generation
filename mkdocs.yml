@@ -1,0 +1,140 @@
+site_name: AutoCorrect2 Hotstring Generation
+site_url: https://orfadida2000.github.io/autocorrect2-hotstring-generation/
+site_description: Generate typo-based AutoHotkey hotstrings and validate them against AutoCorrect2
+
+repo_url: https://github.com/orfadida2000/autocorrect2-hotstring-generation
+repo_name: orfadida2000/autocorrect2-hotstring-generation
+
+theme:
+  name: material
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: dracula
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.top
+    - navigation.tracking
+    - navigation.path
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tabs.link
+
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Project structure: project-structure.md
+
+  - Concepts:
+      - Overview: concepts/index.md
+      - Hotstrings and candidate models: concepts/hotstrings.md
+      - Typo generation: concepts/typo-generation.md
+      - Conflict detection: concepts/conflict-detection.md
+      - AutoCorrect2 integration: concepts/autocorrect2.md
+
+  - Workflows:
+      - Overview: workflows/index.md
+      - Full pipeline: workflows/full-pipeline.md
+      - Typo generation only: workflows/typo-generation.md
+      - AutoCorrect2 check only: workflows/autocorrect2-check.md
+      - Reporting: workflows/reporting.md
+
+  - Configuration:
+      - Typo generation: configuration/typo-generation.md
+      - AutoCorrect2: configuration/autocorrect2.md
+
+  - API Reference:
+      - Overview: api/index.md
+
+      - Core:
+          - Models: api/core/models.md
+          - Hotstring options: api/core/options.md
+          - Conflict detection: api/core/conflicts.md
+          - Pipelines: api/core/pipeline.md
+          - Reports: api/core/report.md
+          - File I/O: api/core/file-io.md
+          - Constants: api/core/constants.md
+
+      - Typo generation:
+          - Models: api/typo-generation/models.md
+          - Generation: api/typo-generation/generation.md
+          - Execution: api/typo-generation/execution.md
+          - Aggregation: api/typo-generation/aggregation.md
+
+      - AutoCorrect2:
+          - Models: api/autocorrect2/models.md
+          - Parser: api/autocorrect2/parser.md
+          - Writer: api/autocorrect2/writer.md
+          - Constants: api/autocorrect2/constants.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - .
+          options:
+            filters:
+              - "!^__weakref__$"
+              - "!^__dict__$"
+            docstring_style: google
+            members_order: source
+            show_root_heading: true
+            show_root_full_path: false
+            heading_level: 2
+            show_source: true
+            separate_signature: true
+            show_signature_annotations: true
+            scoped_crossrefs: true
+            relative_crossrefs: true
+            signature_crossrefs: true
+            show_if_no_docstring: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - toc:
+      permalink: true
+
+extra_css:
+  - https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap
+  - assets/stylesheets/extra.css
+  - assets/stylesheets/catppuccin-latte.css
+  - assets/stylesheets/catppuccin-mocha.css
+  - assets/stylesheets/dracula.css
+
+copyright: Copyright &copy; 2026 Or Fadida
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/orfadida2000
+      name: GitHub profile

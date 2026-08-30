@@ -1,0 +1,3 @@
+# Hotstring options
+
+::: hotstring.options

@@ -1,0 +1,56 @@
+# Project-specific
+hotstring_generation_report.txt
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+build/
+dist/
+wheels/
+*.egg-info
+.python-version
+
+# Virtual environments
+.venv
+
+# Logs
+*.log
+logs/
+
+# Cache directories
+.pytest_cache/
+.ruff_cache/
+
+# Documentation
+site/
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# OS-generated files (Windows)
+Thumbs.db
+[D|d]esktop.ini
+$RECYCLE.BIN/
+$Recycle.Bin/
+System Volume Information/
+ehthumbs.db
+
+# OS-generated files (Linux)
+*~
+.~lock.*
+*.swp
+*.swo
+*.tmp
+
+# OS-generated files (macOS)
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+

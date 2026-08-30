@@ -1,0 +1,3 @@
+# Core constants
+
+::: hotstring.constants

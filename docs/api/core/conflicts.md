@@ -1,0 +1,3 @@
+# Conflict detection
+
+::: hotstring.conflicts
