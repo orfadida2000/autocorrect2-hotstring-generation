@@ -6,6 +6,9 @@ from typing import Final
 AUTOCORRECT2_PROJECT_DIR: Final[Path] = Path("C:/PATH/TO/AutoCorrect2")
 """Default local AutoCorrect2 project directory placeholder."""
 
+AUTOCORRECT2_MAIN_RELATIVE_PATH: Final[Path] = Path("Core/AutoCorrect2.ahk")
+"""Relative path to AutoCorrect2's main script."""
+
 AUTOCORRECT_HOTSTRINGS_RELATIVE_PATH: Final[Path] = Path("Core/AutoCorrectHotstrings.ahk")
 """Relative path to the auto-correct hotstring source file in AutoCorrect2, which is used as the entry point for autocorrect hotstrings."""
 

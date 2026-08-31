@@ -1,5 +1,7 @@
 # Project-specific
 hotstring_generation_report.txt
+test/
+tests/
 
 # Python-generated files
 __pycache__/
