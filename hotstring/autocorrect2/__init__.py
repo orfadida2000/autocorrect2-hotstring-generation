@@ -1,11 +1,13 @@
-"""AutoCorrect2-specific source inspection and conflict reporting."""
+"""AutoCorrect2-specific models, source parsing, and generated-file writing."""
 
+from .models import AutoCorrect2CandidateHotstring, AutoCorrect2CheckResult
 from .parser import extract_hotstrings, load_existing_hotstrings
-from .report import create_conflict_report, write_conflict_report
+from .writer import append_candidates
 
 __all__ = [
-    "create_conflict_report",
+    "AutoCorrect2CandidateHotstring",
+    "AutoCorrect2CheckResult",
+    "append_candidates",
     "extract_hotstrings",
     "load_existing_hotstrings",
-    "write_conflict_report",
 ]

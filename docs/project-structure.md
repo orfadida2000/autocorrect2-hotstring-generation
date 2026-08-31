@@ -3,6 +3,10 @@
 ```text
 autocorrect2-hotstring-generation/
 ├── docs/
+│   ├── api/
+│   ├── concepts/
+│   ├── configuration/
+│   └── workflows/
 ├── hotstring/
 │   ├── autocorrect2/
 │   │   ├── constants.py
@@ -28,4 +32,10 @@ autocorrect2-hotstring-generation/
 
 Generic AutoHotkey behavior lives directly under `hotstring/`.
 AutoCorrect2-specific knowledge is isolated under `hotstring/autocorrect2/`,
-while typo generation remains independent under `hotstring/typo_generation/`.
+while typo generation remains independent under
+`hotstring/typo_generation/`.
+
+The option model is also generic: `HotstringOptions` represents the declaration
+as written, while `ResolvedHotstringOptions` represents the effective option
+state after inheritance has been resolved for a particular declaration
+position.

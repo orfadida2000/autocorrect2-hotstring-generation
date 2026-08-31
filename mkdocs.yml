@@ -51,7 +51,7 @@ nav:
 
   - Concepts:
       - Overview: concepts/index.md
-      - Hotstrings and candidate models: concepts/hotstrings.md
+      - Hotstrings and options: concepts/hotstrings.md
       - Typo generation: concepts/typo-generation.md
       - Conflict detection: concepts/conflict-detection.md
       - AutoCorrect2 integration: concepts/autocorrect2.md

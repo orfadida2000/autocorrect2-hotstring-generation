@@ -2,28 +2,35 @@
 
 ## Install
 
-With `uv`:
+The project uses `uv` and is configured as a non-package project. A normal sync
+installs the runtime dependency plus the default `dev` and `docs` groups:
 
 ```powershell
 uv sync
-uv sync --group docs
 ```
 
 ## Configure AutoCorrect2
 
 Update `AUTOCORRECT2_PROJECT_DIR` in
-`hotstring/autocorrect2/constants.py` or pass `project_dir` explicitly to the
-pipeline functions.
+`hotstring/autocorrect2/constants.py`, or pass the AutoCorrect2 project path to
+the relevant pipeline API when supported.
 
-Add a one-time `#Include` for `Core/GeneratedHotstrings.ahk` inside the same
-`#HotIf AutoCorrectionsActivelyRunning()` context used by AutoCorrect2's main
-autocorrection library.
+Add a one-time `#Include` for `Core/GeneratedHotstrings.ahk` in the same active
+AutoCorrect2 hotstring context as the main autocorrection library. The generated
+file remains project-owned and is scanned on later runs when it exists.
 
-## Build documentation
+## Build the documentation
 
 ```powershell
-uv run --group docs mkdocs serve
+uv run mkdocs serve
 ```
 
-Add the four custom CSS files described in `mkdocs.yml` under
-`docs/assets/stylesheets/` before serving the final themed documentation.
+The MkDocs configuration references these custom stylesheet files under
+`docs/assets/stylesheets/`:
+
+- `catppuccin-latte.css`
+- `catppuccin-mocha.css`
+- `dracula.css`
+- `extra.css`
+
+Add those files before serving the final themed documentation.

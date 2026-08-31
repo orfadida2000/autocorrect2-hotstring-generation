@@ -1,10 +1,4 @@
-"""Extract static hotstring definitions from AutoCorrect2 source files.
-
-The parser scans complete source files with one multiline regular
-expression. Only the options and trigger portions are captured because
-replacement text and executable bodies are irrelevant to contradiction
-detection.
-"""
+"""Extract static hotstring declarations from AutoCorrect2 source files."""
 
 from __future__ import annotations
 
@@ -17,45 +11,41 @@ from ..models import ExistingHotstring
 from ..options import HotstringOptions
 from .constants import (
     AUTOCORRECT2_PROJECT_DIR,
-    HOTSTRING_SOURCE_RELATIVE_PATHS,
+    OPTIONAL_HOTSTRING_SOURCE_RELATIVE_PATHS,
+    REQUIRED_HOTSTRING_SOURCE_RELATIVE_PATHS,
 )
+
 
 HOTSTRING_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^[ \t]*:([^\r\n:]*):([^\r\n]+?)::",
     re.MULTILINE,
 )
-"""Pattern capturing a static hotstring's options and trigger."""
+"""Pattern capturing the option string and trigger of a static hotstring."""
 
 
-def extract_hotstrings(
-    file_path: Path,
-    *,
-    source: Path,
-) -> list[ExistingHotstring]:
-    """Extract static hotstrings from one source file.
+def extract_hotstrings(file_path: Path, *, source: Path) -> list[ExistingHotstring]:
+    """Extract hotstring declarations from one AutoCorrect2 source file.
 
     Args:
         file_path:
-            Absolute path of the file to read.
+            File to scan.
         source:
-            Source identifier stored on each extracted hotstring, normally
-            relative to the AutoCorrect2 project directory.
+            Source identifier stored on each extracted definition.
 
     Returns:
-        Extracted hotstrings in declaration order.
+        Existing hotstrings in declaration order.
 
     Raises:
         OSError:
-            If the source file cannot be read.
+            If the file cannot be read.
         ValueError:
-            If a captured option string is invalid.
+            If an extracted option string is invalid.
     """
     content = file_path.read_text(encoding="utf-8-sig")
-
     return [
         ExistingHotstring(
-            options=HotstringOptions(match.group(1)),
             trigger=match.group(2),
+            options=HotstringOptions(match.group(1)),
             source=source,
         )
         for match in HOTSTRING_PATTERN.finditer(content)
@@ -64,40 +54,43 @@ def extract_hotstrings(
 
 def load_existing_hotstrings(
     project_dir: Path = AUTOCORRECT2_PROJECT_DIR,
-    source_paths: Sequence[Path] = HOTSTRING_SOURCE_RELATIVE_PATHS,
+    *,
+    required_source_paths: Sequence[Path] = REQUIRED_HOTSTRING_SOURCE_RELATIVE_PATHS,
+    optional_source_paths: Sequence[Path] = OPTIONAL_HOTSTRING_SOURCE_RELATIVE_PATHS,
 ) -> list[ExistingHotstring]:
-    """Load hotstrings from all configured AutoCorrect2 source files.
+    """Load all configured active static AutoCorrect2 hotstrings.
+
+    Required sources must exist. Optional sources, including the project-owned
+    generated include file, are scanned only when present.
 
     Args:
         project_dir:
-            Base AutoCorrect2 project directory.
-        source_paths:
-            Source paths relative to `project_dir`.
+            AutoCorrect2 project directory.
+        required_source_paths:
+            Relative source paths that must exist.
+        optional_source_paths:
+            Relative source paths scanned when present.
 
     Returns:
-        All extracted definitions in source-file and declaration order.
+        Existing hotstrings in source-file and declaration order.
 
     Raises:
         FileNotFoundError:
-            If a configured source path is not an existing file.
+            If a required source does not exist.
         OSError:
-            If a source file cannot be read.
-        ValueError:
-            If a discovered option string is invalid.
+            If a source cannot be read.
     """
     hotstrings: list[ExistingHotstring] = []
 
-    for relative_path in source_paths:
+    for relative_path in required_source_paths:
         file_path = project_dir / relative_path
-
         if not file_path.is_file():
             raise FileNotFoundError(f"Hotstring source file was not found: {file_path}")
+        hotstrings.extend(extract_hotstrings(file_path, source=relative_path))
 
-        hotstrings.extend(
-            extract_hotstrings(
-                file_path,
-                source=relative_path,
-            )
-        )
+    for relative_path in optional_source_paths:
+        file_path = project_dir / relative_path
+        if file_path.is_file():
+            hotstrings.extend(extract_hotstrings(file_path, source=relative_path))
 
     return hotstrings
