@@ -87,7 +87,10 @@ nav:
 
       - AutoCorrect2:
           - Models: api/autocorrect2/models.md
-          - Parser: api/autocorrect2/parser.md
+          - Source loading:
+              - Parser: api/autocorrect2/parser.md
+              - Cache: api/autocorrect2/cache.md
+              - Loader: api/autocorrect2/loader.md
           - Writer: api/autocorrect2/writer.md
           - Constants: api/autocorrect2/constants.md
 
@@ -113,7 +116,7 @@ plugins:
             scoped_crossrefs: true
             relative_crossrefs: true
             signature_crossrefs: true
-            show_if_no_docstring: false
+            show_if_no_docstring: true
 
 markdown_extensions:
   - admonition

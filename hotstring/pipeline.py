@@ -18,7 +18,7 @@ from .autocorrect2.models import (
     AutoCorrect2CandidateHotstring,
     AutoCorrect2CheckResult,
 )
-from .autocorrect2.parser import load_existing_hotstrings
+from .autocorrect2.source_loading import load_existing_hotstrings
 from .autocorrect2.writer import append_candidates
 from .conflicts import assess_candidates
 from .file_io import write_text
@@ -30,9 +30,12 @@ from .report import (
     create_typo_generation_report,
 )
 from .typo_generation.aggregation import aggregate_typo_samples
-from .typo_generation.execution import execute_typo_generation
-from .typo_generation.models import TypoGenerationConfig, TypoGenerationResult
-
+from .typo_generation.execution import execute_typo_generation_tasks
+from .typo_generation.models import (
+    TypoGenerationConfig,
+    TypoGenerationResult,
+    TypoGenerationTask,
+)
 
 GENERATED_CANDIDATE_OPTIONS: Final[HotstringOptions] = HotstringOptions("B0X")
 """Options assigned when the full pipeline converts typo mappings to hotstrings."""
@@ -55,6 +58,7 @@ class FullPipelineResult:
 
 def run_typo_generation(
     word_list: Sequence[str],
+    tasks: Sequence[TypoGenerationTask],
     config: TypoGenerationConfig,
     *,
     n_workers: int | None = None,
@@ -66,10 +70,13 @@ def run_typo_generation(
     Args:
         word_list:
             Source words to corrupt.
+        tasks:
+            Ordered typo-generation tasks to execute.
         config:
-            Semantic typo-generation configuration.
+            Shared MULTYPO generator configuration.
         n_workers:
-            Optional process-pool size.
+            Optional process-pool size. Task count is independent of worker
+            count; the pool schedules all supplied tasks.
         report_path:
             Optional path for a typo-generation-only report.
         logger:
@@ -83,8 +90,11 @@ def run_typo_generation(
             If a requested report cannot be written.
     """
     words = list(word_list)
-    samples = execute_typo_generation(
+    task_tuple = tuple(tasks)
+
+    samples = execute_typo_generation_tasks(
         words,
+        task_tuple,
         config,
         n_workers=n_workers,
         logger=logger,
@@ -92,6 +102,7 @@ def run_typo_generation(
     result = aggregate_typo_samples(
         samples,
         config=config,
+        tasks=task_tuple,
         source_word_count=len(words),
     )
 
@@ -101,6 +112,7 @@ def run_typo_generation(
             "TYPO GENERATION REPORT",
             create_typo_generation_report(result),
         )
+
     return result
 
 
@@ -166,11 +178,13 @@ def run_autocorrect2_check(
             "AUTOCORRECT2 CONFLICT CHECK REPORT",
             create_autocorrect2_report(result),
         )
+
     return result
 
 
 def run_full_pipeline(
     word_list: Sequence[str],
+    tasks: Sequence[TypoGenerationTask],
     config: TypoGenerationConfig,
     *,
     n_workers: int | None = None,
@@ -183,14 +197,16 @@ def run_full_pipeline(
 
     The function reuses the two independent stage pipelines without asking
     either stage to create its own report. Valid typo mappings are normalized
-    into [`AutoCorrect2CandidateHotstring`][hotstring.autocorrect2.models.AutoCorrect2CandidateHotstring]
-    objects with the project's fixed generated `B0X` options.
+    into `AutoCorrect2CandidateHotstring` objects with the project's fixed
+    generated `B0X` options.
 
     Args:
         word_list:
             Source words to corrupt.
+        tasks:
+            Ordered typo-generation tasks to execute.
         config:
-            Semantic typo-generation configuration.
+            Shared MULTYPO generator configuration.
         n_workers:
             Optional process-pool size.
         project_dir:
@@ -215,6 +231,7 @@ def run_full_pipeline(
     """
     typo_result = run_typo_generation(
         word_list,
+        tasks,
         config,
         n_workers=n_workers,
         report_path=None,
@@ -245,6 +262,7 @@ def run_full_pipeline(
             "AUTOHOTKEY HOTSTRING GENERATION REPORT",
             create_full_pipeline_report(typo_result, autocorrect2_result),
         )
+
     return result
 
 

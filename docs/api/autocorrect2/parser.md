@@ -1,3 +1,3 @@
-# AutoCorrect2 parser
+# AutoCorrect2 source parser
 
-::: hotstring.autocorrect2.parser
+::: hotstring.autocorrect2.source_loading.parser

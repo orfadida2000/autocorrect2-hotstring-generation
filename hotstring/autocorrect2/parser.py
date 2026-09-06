@@ -15,7 +15,6 @@ from .constants import (
     REQUIRED_HOTSTRING_SOURCE_RELATIVE_PATHS,
 )
 
-
 HOTSTRING_PATTERN: Final[re.Pattern[str]] = re.compile(
     r"^[ \t]*:([^\r\n:]*):([^\r\n]+?)::",
     re.MULTILINE,

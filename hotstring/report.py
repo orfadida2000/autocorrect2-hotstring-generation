@@ -23,30 +23,39 @@ def create_typo_generation_report(result: TypoGenerationResult) -> list[str]:
     Returns:
         Report body as individual text lines.
     """
+    horizontal_weight, vertical_weight = result.config.horizontal_vs_vertical
+
     lines = [
         "TYPO GENERATION",
         "-" * 80,
         f"Source words: {result.source_word_count}",
-        f"Generation attempts per word per distribution: "
-        f"{result.config.generation_attempts_per_word}",
-        f"Typo distributions: {len(result.config.typo_distributions)}",
+        f"Generation tasks: {len(result.tasks)}",
+        f"Language: {result.config.language}",
+        f"Use excluding set: {result.config.use_excluding_set}",
+        f"Horizontal/vertical keyboard weights: {horizontal_weight}/{vertical_weight}",
         f"Successful raw samples: {result.generated_sample_count}",
         f"Unique noisy words: {result.unique_noisy_word_count}",
         f"Valid candidates: {len(result.candidates)}",
         f"Internal clashes: {len(result.clashes)}",
         "",
-        "DISTRIBUTIONS",
+        "TASKS",
+        "-" * 80,
     ]
 
-    for index, distribution in enumerate(result.config.typo_distributions, start=1):
-        lines.append(f"{index}. {distribution.distribution}")
+    for index, task in enumerate(result.tasks, start=1):
+        lines.extend(
+            (
+                f"Task {index}",
+                f"  Distribution: {task.distribution.distribution}",
+                f"  Typo rate: {task.typo_rate}",
+                f"  Generation attempts per word: {task.generation_attempts_per_word}",
+                f"  Minimum word length: {task.minimum_word_length}",
+            )
+        )
 
     lines.extend(("", "VALID TYPO CANDIDATES", "-" * 80))
     if result.candidates:
-        lines.extend(
-            f"{noisy!r} -> {target!r}"
-            for noisy, target in result.candidates.items()
-        )
+        lines.extend(f"{noisy!r} -> {target!r}" for noisy, target in result.candidates.items())
     else:
         lines.append("None")
 
@@ -84,8 +93,7 @@ def create_autocorrect2_report(result: AutoCorrect2CheckResult) -> list[str]:
 
     if result.accepted:
         lines.extend(
-            f"{candidate.trigger!r} -> {candidate.replacement!r}"
-            for candidate in result.accepted
+            f"{candidate.trigger!r} -> {candidate.replacement!r}" for candidate in result.accepted
         )
     else:
         lines.append("None")
@@ -108,6 +116,7 @@ def create_autocorrect2_report(result: AutoCorrect2CheckResult) -> list[str]:
                     "",
                 )
             )
+
     return lines
 
 
@@ -139,6 +148,7 @@ def create_full_pipeline_report(
             f"Final accepted hotstrings: {len(autocorrect2_result.accepted)}",
         )
     )
+
     return lines
 
 
@@ -164,4 +174,5 @@ def build_report_document(title: str, body_lines: Sequence[str]) -> list[str]:
     """
     if not title:
         raise ValueError("Report title cannot be empty.")
+
     return [title, "=" * 80, "", *body_lines]

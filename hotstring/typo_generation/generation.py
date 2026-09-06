@@ -1,4 +1,4 @@
-"""Perform low-level single-distribution typo sampling with MULTYPO."""
+"""Perform low-level typo sampling for one generation task with MULTYPO."""
 
 from __future__ import annotations
 
@@ -7,35 +7,36 @@ from collections.abc import Sequence
 
 from multypo import MultiTypoGenerator
 
-from .models import RawTypoSample, TypoDistribution, TypoGenerationConfig
+from .models import RawTypoSample, TypoGenerationConfig, TypoGenerationTask
 
 
-def generate_typos_for_distribution(
+def generate_typos_for_task(
     word_list: Sequence[str],
-    typo_distribution: TypoDistribution,
+    task: TypoGenerationTask,
     config: TypoGenerationConfig,
     *,
     logger: logging.Logger | None = None,
 ) -> list[RawTypoSample]:
-    """Generate noisy samples for every source word using one distribution.
+    """Generate noisy samples for all words eligible for one task.
 
-    Each input is deliberately treated as one word and MULTYPO is always
-    called with `typo_rate=1.0`. The project-level sampling budget is instead
-    represented explicitly by `generation_attempts_per_word`.
+    `task.typo_rate` is passed directly to MULTYPO's `insert_typos` method.
+    The task's attempt count controls how many independent samples are drawn
+    per eligible word, while `minimum_word_length` filters the shared word set.
 
     Args:
         word_list:
-            Source words to corrupt.
-        typo_distribution:
-            Typo-operation distribution used for this sampling pass.
+            Shared source words to consider.
+        task:
+            Task-specific distribution, typo rate, sampling budget, and
+            minimum word length.
         config:
-            Typo-generation configuration.
+            Shared MULTYPO generator configuration.
         logger:
-            Optional logger for progress messages.
+            Optional logger for progress and diagnostic messages.
 
     Returns:
-        Successful noisy-word samples. Repeated identical samples are kept
-        here and deduplicated later by aggregation.
+        Successful raw typo samples. Repeated identical samples are retained
+        and deduplicated later by aggregation.
 
     Raises:
         TypeError:
@@ -43,51 +44,62 @@ def generate_typos_for_distribution(
         ValueError:
             If a source word is empty or contains whitespace.
     """
-    generator = _create_generator(typo_distribution, config)
+    generator = _create_generator(task, config)
+    normalized_words = tuple(_normalize_source_word(word) for word in word_list)
+    eligible_words = tuple(
+        word for word in normalized_words if len(word) >= task.minimum_word_length
+    )
+
     if logger is not None:
         logger.info(
-            "Generating typo samples for %d words with distribution %s",
-            len(word_list),
-            typo_distribution.distribution,
+            "Generating typo samples for %d/%d eligible words with "
+            "typo_rate=%s, attempts_per_word=%d, distribution=%s",
+            len(eligible_words),
+            len(normalized_words),
+            task.typo_rate,
+            task.generation_attempts_per_word,
+            task.distribution.distribution,
         )
 
     generated: list[RawTypoSample] = []
-    for source_word in word_list:
-        target_word = _normalize_source_word(source_word)
+    for target_word in eligible_words:
+        for _ in range(task.generation_attempts_per_word):
+            noisy_word = generator.insert_typos(
+                target_word,
+                typo_rate=float(task.typo_rate),
+            ).lower()
 
-        for _ in range(config.generation_attempts_per_word):
-            noisy_word = generator.insert_typos(target_word, typo_rate=1.0).lower()
             if noisy_word == target_word:
                 if logger is not None:
                     logger.debug(
-                        "MULTYPO returned the unchanged word %r; skipping this sample.",
+                        "MULTYPO returned unchanged word %r for task %r; skipping this sample.",
                         target_word,
+                        task,
                     )
                 continue
-            generated.append(
-                RawTypoSample(noisy_word=noisy_word, target_word=target_word)
-            )
+
+            generated.append(RawTypoSample(noisy_word=noisy_word, target_word=target_word))
 
     if logger is not None:
         logger.info(
-            "Completed distribution %s with %d successful samples.",
-            typo_distribution.distribution,
+            "Completed typo-generation task with %d successful samples.",
             len(generated),
         )
+
     return generated
 
 
 def _create_generator(
-    typo_distribution: TypoDistribution,
+    task: TypoGenerationTask,
     config: TypoGenerationConfig,
 ) -> MultiTypoGenerator:
-    """Create a configured MULTYPO generator for one distribution.
+    """Create a configured MULTYPO generator for one task.
 
     Args:
-        typo_distribution:
-            Distribution to pass to MULTYPO.
+        task:
+            Task supplying the typo distribution.
         config:
-            Shared generation configuration.
+            Shared generator configuration.
 
     Returns:
         Configured [`MultiTypoGenerator`][multypo.MultiTypoGenerator].
@@ -95,13 +107,13 @@ def _create_generator(
     return MultiTypoGenerator(
         language=config.language,
         use_excluding_set=config.use_excluding_set,
-        typo_distribution=typo_distribution.distribution,
+        typo_distribution=task.distribution.distribution,
         horizontal_vs_vertical=config.horizontal_vs_vertical,
     )
 
 
 def _normalize_source_word(source_word: str) -> str:
-    """Validate and normalize a source word to lowercase.
+    """Validate and normalize one source word to lowercase.
 
     Args:
         source_word:
@@ -117,13 +129,12 @@ def _normalize_source_word(source_word: str) -> str:
             If it is empty or contains whitespace.
     """
     if not isinstance(source_word, str):
-        raise TypeError(
-            f"Source words must be strings, not {type(source_word).__name__}."
-        )
+        raise TypeError(f"Source words must be strings, not {type(source_word).__name__}.")
     if not source_word:
         raise ValueError("Source words cannot be empty.")
     if any(char.isspace() for char in source_word):
         raise ValueError(
             f"Source word must contain exactly one word and no whitespace: {source_word!r}"
         )
+
     return source_word.lower()

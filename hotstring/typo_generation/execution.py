@@ -1,135 +1,173 @@
-"""Execute typo generation serially or with a spawned process pool."""
+"""Execute typo-generation tasks serially or with a spawned process pool."""
 
 from __future__ import annotations
 
 import logging
 import multiprocessing as mp
 import os
+import sys
+from collections.abc import Sequence
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 from logging.handlers import QueueHandler, QueueListener
-from typing import Any
+from multiprocessing.context import BaseContext
+from typing import Any, Final
 
-from .generation import generate_typos_for_distribution
-from .models import RawTypoSample, TypoDistribution, TypoGenerationConfig
+from .generation import generate_typos_for_task
+from .models import RawTypoSample, TypoGenerationConfig, TypoGenerationTask
 
+_MAX_WINDOWS_PROCESS_POOL_WORKERS: Final[int] = 61
 
 _WORKER_LOGGER: logging.Logger | None = None
 
 
-def execute_typo_generation(
-    word_list: list[str],
+def execute_typo_generation_tasks(
+    word_list: Sequence[str],
+    tasks: Sequence[TypoGenerationTask],
     config: TypoGenerationConfig,
     *,
     n_workers: int | None = None,
     logger: logging.Logger | None = None,
 ) -> list[RawTypoSample]:
-    """Execute all configured typo distributions and collect raw samples.
+    """Execute all typo-generation tasks and collect their raw samples.
 
-    Serial execution is used when one distribution is configured or the
-    requested effective worker count is one. Otherwise the function uses a
-    Windows-compatible spawned process pool.
+    Task count is independent of worker count. Serial execution is used when
+    only one task is supplied or the requested effective worker count is one;
+    otherwise all tasks are submitted to a spawned process pool and workers
+    consume tasks as they become available.
 
     Args:
         word_list:
-            Source words to corrupt.
+            Shared source words considered by every task.
+        tasks:
+            Ordered typo-generation tasks to execute.
         config:
-            Typo-generation configuration.
+            Shared generator configuration.
         n_workers:
             Requested process-pool size, or `None` for the executor default.
         logger:
             Optional orchestration logger.
 
     Returns:
-        Raw successful samples from all distributions.
+        Concatenated raw samples in input task order.
 
     Raises:
         TypeError:
-            If `n_workers` is neither a positive integer nor `None`.
+            If `n_workers` or a task has an invalid type.
         ValueError:
-            If `n_workers` is not positive.
+            If no tasks are supplied or `n_workers` is not positive.
         RuntimeError:
             If a parallel generation task fails.
     """
     _validate_worker_count(n_workers)
-    distributions = config.typo_distributions
-    effective_n_workers = (
-        min(n_workers, len(distributions)) if n_workers is not None else None
-    )
+    task_tuple = _normalize_tasks(tasks)
+    words = list(word_list)
 
-    if len(distributions) == 1 or effective_n_workers == 1:
+    if n_workers is None:
+        effective_n_workers = None
+    else:
+        available_cpus = (
+            os.process_cpu_count() if hasattr(os, "process_cpu_count") else os.cpu_count()
+        ) or 1
+
+        max_allowed_workers = available_cpus
+
+        if sys.platform == "win32":
+            # ProcessPoolExecutor limits max_workers to 61 on Windows.
+            max_allowed_workers = min(max_allowed_workers, _MAX_WINDOWS_PROCESS_POOL_WORKERS)
+
+        effective_n_workers = min(
+            n_workers,
+            len(task_tuple),
+            max_allowed_workers,
+        )
+
+    if len(task_tuple) == 1 or effective_n_workers == 1:
         if logger is not None:
-            logger.info("Using serial typo-generation execution.")
-        return _execute_serial(word_list, config, logger=logger)
+            logger.info(
+                "Using serial typo-generation execution for %d task(s).",
+                len(task_tuple),
+            )
+        return _execute_tasks_serial(words, task_tuple, config, logger=logger)
 
     if logger is not None:
         logger.info(
-            "Using parallel typo-generation execution with max workers=%s.",
+            "Using parallel typo-generation execution for %d tasks with max workers=%s.",
+            len(task_tuple),
             "executor default" if effective_n_workers is None else effective_n_workers,
         )
-    return _execute_parallel(
-        word_list,
+
+    return _execute_tasks_parallel(
+        words,
+        task_tuple,
         config,
         n_workers=effective_n_workers,
         logger=logger,
     )
 
 
-def _execute_serial(
+def _execute_tasks_serial(
     word_list: list[str],
+    tasks: tuple[TypoGenerationTask, ...],
     config: TypoGenerationConfig,
     *,
     logger: logging.Logger | None,
 ) -> list[RawTypoSample]:
-    """Generate every configured distribution in the current process.
+    """Execute every task in the current process.
 
     Args:
         word_list:
-            Source words.
+            Shared source words.
+        tasks:
+            Ordered tasks to execute.
         config:
-            Typo-generation configuration.
+            Shared generator configuration.
         logger:
             Optional logger forwarded to low-level generation.
 
     Returns:
-        Concatenated raw samples.
+        Concatenated raw samples in task order.
     """
     samples: list[RawTypoSample] = []
-    for distribution in config.typo_distributions:
+    for task in tasks:
         samples.extend(
-            generate_typos_for_distribution(
+            generate_typos_for_task(
                 word_list,
-                distribution,
+                task,
                 config,
                 logger=logger,
             )
         )
+
     return samples
 
 
-def _execute_parallel(
+def _execute_tasks_parallel(
     word_list: list[str],
+    tasks: tuple[TypoGenerationTask, ...],
     config: TypoGenerationConfig,
     *,
     n_workers: int | None,
     logger: logging.Logger | None,
 ) -> list[RawTypoSample]:
-    """Generate configured distributions with a spawned process pool.
+    """Execute tasks with a spawned process pool.
 
-    Worker records are forwarded to existing root handlers through a queue
-    when the parent process has non-null logging handlers.
+    Worker log records are forwarded to the parent process through a queue
+    when the parent root logger has at least one non-null handler.
 
     Args:
         word_list:
-            Source words.
+            Shared source words.
+        tasks:
+            Ordered tasks to submit.
         config:
-            Typo-generation configuration.
+            Shared generator configuration.
         n_workers:
             Effective process-pool size.
         logger:
             Optional orchestration logger.
 
     Returns:
-        Concatenated raw samples.
+        Concatenated raw samples in input task order.
 
     Raises:
         RuntimeError:
@@ -137,23 +175,33 @@ def _execute_parallel(
     """
     mp_context = mp.get_context("spawn")
     root_logger = logging.getLogger()
-    root_handlers = [
-        handler
-        for handler in root_logger.handlers
-        if not isinstance(handler, logging.NullHandler)
-    ]
-    logger_name = logger.name if logger is not None else "typo_generation"
+    root_handlers = tuple(
+        handler for handler in root_logger.handlers if not isinstance(handler, logging.NullHandler)
+    )
+    manager_logger_name = logger.name if logger is not None else "typo_generation"
+
+    if logger is not None:
+        logger.debug(
+            "Using multiprocessing start method %r.",
+            mp_context.get_start_method(),
+        )
 
     if not root_handlers:
-        return _run_process_pool(
+        if logger is not None:
+            logger.debug("No non-null root handlers found; worker log forwarding is disabled.")
+        return _multi_worker_typo_generation(
             word_list,
+            tasks,
             config,
             n_workers=n_workers,
             mp_context=mp_context,
             proxy_queue=None,
             root_level=root_logger.level,
-            logger_name=logger_name,
+            manager_logger_name=manager_logger_name,
         )
+
+    if logger is not None:
+        logger.debug("Root handlers found; worker log records will be forwarded through a queue.")
 
     with mp_context.Manager() as manager:
         proxy_queue = manager.Queue(-1)
@@ -164,133 +212,210 @@ def _execute_parallel(
         )
         listener.start()
         try:
-            return _run_process_pool(
+            return _multi_worker_typo_generation(
                 word_list,
+                tasks,
                 config,
                 n_workers=n_workers,
                 mp_context=mp_context,
                 proxy_queue=proxy_queue,
                 root_level=root_logger.level,
-                logger_name=logger_name,
+                manager_logger_name=manager_logger_name,
             )
         finally:
             listener.stop()
 
 
-def _run_process_pool(
+def _multi_worker_typo_generation(
     word_list: list[str],
+    tasks: tuple[TypoGenerationTask, ...],
     config: TypoGenerationConfig,
     *,
     n_workers: int | None,
-    mp_context: Any,
+    mp_context: BaseContext,
     proxy_queue: Any | None,
     root_level: int,
-    logger_name: str,
+    manager_logger_name: str,
 ) -> list[RawTypoSample]:
-    """Submit one process-pool task per typo distribution.
+    """Submit every generation task to a process pool and collect results.
+
+    More tasks than workers is expected: `ProcessPoolExecutor` schedules the
+    pending tasks onto available worker processes. Results are collected as
+    futures finish but are concatenated afterward in original task order.
 
     Args:
         word_list:
-            Source words.
+            Shared source words.
+        tasks:
+            Ordered tasks to submit.
         config:
-            Typo-generation configuration.
+            Shared generator configuration.
         n_workers:
             Effective pool size.
         mp_context:
             Spawn multiprocessing context.
         proxy_queue:
-            Optional multiprocessing logging queue.
+            Optional queue forwarding worker log records to the parent.
         root_level:
             Parent root logger level reproduced in workers.
-        logger_name:
-            Base logger namespace for workers.
+        manager_logger_name:
+            Logger namespace used for process-specific worker loggers.
 
     Returns:
-        Concatenated worker results.
+        Concatenated worker results in input task order.
 
     Raises:
         RuntimeError:
-            If any worker task raises.
+            If any submitted generation task raises.
     """
-    samples: list[RawTypoSample] = []
+    results_by_index: dict[int, list[RawTypoSample]] = {}
+
     with ProcessPoolExecutor(
         max_workers=n_workers,
         mp_context=mp_context,
         initializer=_initialize_worker,
-        initargs=(proxy_queue, root_level, logger_name),
+        initargs=(
+            root_level,
+            proxy_queue,
+            manager_logger_name,
+        ),
     ) as executor:
-        futures: dict[Future[list[RawTypoSample]], TypoDistribution] = {
+        future_to_task: dict[Future[list[RawTypoSample]], tuple[int, TypoGenerationTask]] = {
             executor.submit(
-                _generate_in_worker,
-                distribution,
+                _generate_task_in_worker,
                 word_list,
+                task,
                 config,
-            ): distribution
-            for distribution in config.typo_distributions
+            ): (index, task)
+            for index, task in enumerate(tasks)
         }
 
-        for future in as_completed(futures):
-            distribution = futures[future]
+        for future in as_completed(future_to_task):
+            index, task = future_to_task[future]
             try:
-                samples.extend(future.result())
+                results_by_index[index] = future.result()
             except Exception as error:
                 raise RuntimeError(
-                    "Failed to generate typos for distribution "
-                    f"{distribution.distribution}: {error}"
+                    f"Failed to execute typo-generation task at index {index}: {task!r}"
                 ) from error
-    return samples
+
+    return [sample for index in range(len(tasks)) for sample in results_by_index[index]]
 
 
-def _initialize_worker(
-    proxy_queue: Any | None,
+def _worker_logger_initialization(
     root_level: int,
-    logger_name: str,
+    proxy_queue: Any | None,
+    manager_logger_name: str | None,
 ) -> None:
-    """Initialize process-local logging state in a spawned worker.
+    """Initialize logging inside one spawned worker process.
+
+    This helper is deliberately separate from `_initialize_worker` so future
+    process-global initialization can be added without turning worker logging
+    setup into one large initializer.
 
     Args:
-        proxy_queue:
-            Optional queue forwarding records to the parent.
         root_level:
-            Parent root logger level.
-        logger_name:
-            Base logger namespace.
+            Parent root logger level to reproduce in the worker.
+        proxy_queue:
+            Optional queue that forwards worker records to the parent.
+        manager_logger_name:
+            Optional parent logger namespace for the process-specific logger.
     """
     global _WORKER_LOGGER
 
     root_logger = logging.getLogger()
     root_logger.handlers.clear()
     root_logger.setLevel(root_level)
+
     if proxy_queue is not None:
         root_logger.addHandler(QueueHandler(proxy_queue))
 
-    _WORKER_LOGGER = logging.getLogger(f"{logger_name}.worker_{os.getpid()}")
+    base_worker_logger_name = f"worker_{os.getpid()}"
+    worker_logger_name = (
+        base_worker_logger_name
+        if not manager_logger_name
+        else f"{manager_logger_name}.{base_worker_logger_name}"
+    )
+    _WORKER_LOGGER = logging.getLogger(worker_logger_name)
 
 
-def _generate_in_worker(
-    distribution: TypoDistribution,
-    word_list: list[str],
-    config: TypoGenerationConfig,
-) -> list[RawTypoSample]:
-    """Run one distribution task inside a process-pool worker.
+def _initialize_worker(
+    root_level: int,
+    proxy_queue: Any | None = None,
+    manager_logger_name: str | None = None,
+) -> None:
+    """Initialize process-global state inside a spawned worker process.
 
     Args:
-        distribution:
-            Distribution assigned to this task.
+        root_level:
+            Parent root logger level.
+        proxy_queue:
+            Optional queue forwarding worker log records to the parent.
+        manager_logger_name:
+            Optional logger namespace for the worker logger.
+    """
+    _worker_logger_initialization(
+        root_level,
+        proxy_queue,
+        manager_logger_name,
+    )
+
+
+def _generate_task_in_worker(
+    word_list: list[str],
+    task: TypoGenerationTask,
+    config: TypoGenerationConfig,
+) -> list[RawTypoSample]:
+    """Execute one task inside a process-pool worker.
+
+    Args:
         word_list:
-            Source words.
+            Shared source words.
+        task:
+            Generation task assigned to this worker invocation.
         config:
-            Shared generation configuration.
+            Shared generator configuration.
 
     Returns:
-        Raw successful samples for the distribution.
+        Raw samples produced by the task.
     """
-    return generate_typos_for_distribution(
+    return generate_typos_for_task(
         word_list,
-        distribution,
+        task,
         config,
         logger=_WORKER_LOGGER,
     )
+
+
+def _normalize_tasks(
+    tasks: Sequence[TypoGenerationTask],
+) -> tuple[TypoGenerationTask, ...]:
+    """Validate and freeze the task sequence for one execution run.
+
+    Args:
+        tasks:
+            Caller-supplied task sequence.
+
+    Returns:
+        Immutable task tuple preserving input order.
+
+    Raises:
+        TypeError:
+            If an item is not a `TypoGenerationTask`.
+        ValueError:
+            If no tasks are supplied.
+    """
+    task_tuple = tuple(tasks)
+    if not task_tuple:
+        raise ValueError("At least one typo-generation task must be provided.")
+
+    for index, task in enumerate(task_tuple):
+        if not isinstance(task, TypoGenerationTask):
+            raise TypeError(
+                f"tasks[{index}] must be a TypoGenerationTask, not {type(task).__name__}."
+            )
+
+    return task_tuple
 
 
 def _validate_worker_count(n_workers: int | None) -> None:

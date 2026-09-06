@@ -3,7 +3,9 @@
 from pathlib import Path
 from typing import Final
 
-AUTOCORRECT2_PROJECT_DIR: Final[Path] = Path("C:/PATH/TO/AutoCorrect2")
+AUTOCORRECT2_PROJECT_DIR: Final[Path] = Path(
+    "C:/PATH/TO/AutoCorrect2"
+)  # TODO: Update this path to the actual AutoCorrect2 project directory on your system.
 """Default local AutoCorrect2 project directory placeholder."""
 
 AUTOCORRECT2_MAIN_RELATIVE_PATH: Final[Path] = Path("Core/AutoCorrect2.ahk")

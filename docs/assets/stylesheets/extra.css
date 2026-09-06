@@ -1,0 +1,12 @@
+:root {
+  --md-text-font: "Inter", sans-serif;
+  --md-code-font: "JetBrains Mono", monospace;
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+}
+
+.md-typeset code {
+  font-variant-ligatures: none;
+}
