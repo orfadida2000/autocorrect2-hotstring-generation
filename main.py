@@ -1,8 +1,8 @@
 """Application entry-point placeholder.
 
 The project currently exposes explicit Python pipeline APIs rather than a
-command-line interface. Import the functions from [`hotstring.pipeline`][]
-in application code or an interactive session.
+command-line interface. Import the functions from [`hotstring.pipeline`][] in
+application code or an interactive session.
 """
 
 

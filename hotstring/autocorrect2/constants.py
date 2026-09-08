@@ -5,20 +5,20 @@ from typing import Final
 
 AUTOCORRECT2_PROJECT_DIR: Final[Path] = Path(
     "C:/PATH/TO/AutoCorrect2"
-)  # TODO: Update this path to the actual AutoCorrect2 project directory on your system.
+)  # TODO: Update this path to the actual AutoCorrect2 project directory.
 """Default local AutoCorrect2 project directory placeholder."""
 
 AUTOCORRECT2_MAIN_RELATIVE_PATH: Final[Path] = Path("Core/AutoCorrect2.ahk")
 """Relative path to AutoCorrect2's main script."""
 
 AUTOCORRECT_HOTSTRINGS_RELATIVE_PATH: Final[Path] = Path("Core/AutoCorrectHotstrings.ahk")
-"""Relative path to the auto-correct hotstring source file in AutoCorrect2, which is used as the entry point for autocorrect hotstrings."""
+"""Relative path to AutoCorrect2's main autocorrection hotstring source."""
 
 BOILERPLATE_HOTSTRINGS_RELATIVE_PATH: Final[Path] = Path("Core/PersonalHotstrings.ahk")
-"""Relative path to the boilerplate hotstring source file in AutoCorrect2, which is used as the entry point for personal boilerplate hotstrings."""
+"""Relative path to AutoCorrect2's personal boilerplate hotstring source."""
 
 DATE_TOOL_HOTSTRINGS_RELATIVE_PATH: Final[Path] = Path("Includes/DateTool.ahk")
-"""Relative path to the date-tool hotstring source file in AutoCorrect2."""
+"""Relative path to AutoCorrect2's date-tool hotstring source."""
 
 REQUIRED_HOTSTRING_SOURCE_RELATIVE_PATHS: Final[tuple[Path, ...]] = (
     AUTOCORRECT_HOTSTRINGS_RELATIVE_PATH,

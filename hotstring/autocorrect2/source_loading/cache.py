@@ -1,4 +1,15 @@
-"""Persist AutoCorrect2 source fingerprints and extracted hotstrings."""
+"""Persist AutoCorrect2 source fingerprints and extracted hotstrings.
+
+The cache is an optimization only. SHA-256 of the exact source bytes is the
+authoritative content identity; filesystem size and modification time are
+stored as useful metadata but are never trusted as proof that a same-sized
+source is unchanged.
+
+Cached hotstrings persist only source-derived state: canonical AHK trigger
+spelling and canonical option text. Semantic trigger text and the
+case-insensitive semantic comparison key are reconstructed by the domain model on every
+load so they always reflect the current trigger-normalization implementation.
+"""
 
 from __future__ import annotations
 
@@ -13,17 +24,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Final, cast
 
-from ...models import ExistingHotstring
-from ...options import HotstringOptions
+from hotstring.constants import PROJECT_ROOT
+
+from ...core.models import ExistingHotstring
 
 LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 """Module logger used for cache diagnostics."""
 
-CACHE_SCHEMA_VERSION: Final[int] = 1
-"""Current persistent cache schema version."""
+CACHE_SCHEMA_VERSION: Final[int] = 2
+"""Persistent-cache compatibility version, including parser semantics."""
 
-DEFAULT_SOURCE_CACHE_PATH: Final[Path] = Path(".cache/autocorrect2-source-cache.json")
-"""Default project-local path used for the persistent source cache."""
+DEFAULT_SOURCE_CACHE_PATH: Final[Path] = PROJECT_ROOT / ".cache" / "autocorrect2-source-cache.json"
+"""Deterministic project-local path used for the persistent source cache."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,7 +44,7 @@ class CachedHotstring:
 
     Attributes:
         trigger:
-            Trigger text extracted from the AutoCorrect2 source.
+            Canonical AHK source-form trigger text.
         options:
             Canonical hotstring option declaration.
     """
@@ -68,9 +80,13 @@ class SourceCache:
 
     Attributes:
         project_dir:
-            Canonical AutoCorrect2 project directory associated with the cache.
+            Canonical AutoCorrect2 project directory associated with the
+            cache. This prevents accidental reuse for a different checkout at
+            another path; machine identity is deliberately not part of cache
+            validity.
         files:
-            Cache entries keyed by source path relative to the project root.
+            Cache entries keyed by source path relative to the AutoCorrect2
+            project root.
     """
 
     project_dir: str
@@ -150,6 +166,10 @@ def create_source_cache_entry(
 ) -> SourceCacheEntry:
     """Create a cache entry from parsed hotstrings and source state.
 
+    Cached triggers use each model's canonical `ahk_trigger` field, not its
+    semantic trigger. Restoring the entry therefore feeds exactly the input
+    representation expected by `ExistingHotstring`.
+
     Args:
         hotstrings:
             Parsed hotstrings in declaration order.
@@ -178,9 +198,10 @@ def create_source_cache_entry(
                 "Cached hotstrings must contain ExistingHotstring instances, "
                 f"not {type(hotstring).__name__}"
             )
+
         cached_hotstrings.append(
             CachedHotstring(
-                trigger=hotstring.trigger,
+                trigger=hotstring.ahk_trigger,
                 options=hotstring.options.declaration(),
             )
         )
@@ -200,6 +221,11 @@ def restore_hotstrings(
 ) -> list[ExistingHotstring]:
     """Reconstruct domain hotstrings from one persisted cache entry.
 
+    The cached trigger is intentionally fed back to `ExistingHotstring` as
+    AHK source-form constructor input. Its semantic trigger, canonical source
+    representation, parsed options, and case-insensitive semantic key are therefore
+    rebuilt using the current code.
+
     Args:
         entry:
             Cached source entry to reconstruct.
@@ -213,8 +239,7 @@ def restore_hotstrings(
         TypeError:
             If the cache entry or source identifier has an invalid type.
         ValueError:
-            If cached hotstring data is no longer valid under the current
-            domain model.
+            If cached hotstring data is invalid under the current model.
     """
     if not isinstance(entry, SourceCacheEntry):
         raise TypeError(f"Source cache entry must be SourceCacheEntry, not {type(entry).__name__}")
@@ -224,11 +249,12 @@ def restore_hotstrings(
     hotstrings = [
         ExistingHotstring(
             trigger=hotstring.trigger,
-            options=HotstringOptions(hotstring.options),
+            options_input=hotstring.options,
             source=source,
         )
         for hotstring in entry.hotstrings
     ]
+
     LOGGER.debug(
         "Reconstructed %d hotstring(s) from cached source %s.",
         len(hotstrings),
@@ -242,7 +268,7 @@ def load_source_cache(cache_path: Path, *, project_dir: Path) -> SourceCache:
 
     Missing, unreadable, malformed, incompatible, or project-mismatched cache
     files are treated as disposable optimization state. In those cases an
-    empty cache associated with the requested project is returned.
+    empty cache associated with the requested AutoCorrect2 project is returned.
 
     Args:
         cache_path:
@@ -251,7 +277,7 @@ def load_source_cache(cache_path: Path, *, project_dir: Path) -> SourceCache:
             AutoCorrect2 project directory expected by the caller.
 
     Returns:
-        Loaded compatible cache, or a new empty cache when the persisted state
+        Loaded compatible cache, or a new empty cache when persisted state
         cannot be reused.
 
     Raises:
@@ -320,9 +346,9 @@ def load_source_cache(cache_path: Path, *, project_dir: Path) -> SourceCache:
         files[source_key] = entry
 
     LOGGER.debug(
-        "Loaded %d source-cache entr%s from %s.",
+        "Loaded %d source-cache %s from %s.",
         len(files),
-        "y" if len(files) == 1 else "ies",
+        "entry" if len(files) == 1 else "entries",
         cache_path,
     )
     return SourceCache(project_dir=expected_project_dir, files=files)
@@ -331,9 +357,9 @@ def load_source_cache(cache_path: Path, *, project_dir: Path) -> SourceCache:
 def save_source_cache(cache: SourceCache, cache_path: Path) -> None:
     """Persist the source cache atomically as UTF-8 JSON.
 
-    Each cached hotstring is represented by exactly two keys, `trigger` and
-    `options`. Source paths are stored once as keys in the surrounding `files`
-    object, so individual hotstring records do not duplicate their source.
+    Each cached hotstring contains exactly `trigger` and `options`. The trigger
+    value is the canonical AHK source representation. Source paths are stored
+    once as keys in the surrounding `files` object.
 
     Args:
         cache:
@@ -523,18 +549,18 @@ def _metadata_is_valid(
     size: object,
     sha256: object,
 ) -> bool:
-    """Return whether decoded cache metadata is structurally valid.
+    """Return whether decoded source metadata has the expected shape.
 
     Args:
         modification_time_ns:
             Decoded modification-time value.
         size:
-            Decoded size value.
+            Decoded file-size value.
         sha256:
             Decoded digest value.
 
     Returns:
-        `True` when all metadata fields are valid.
+        Whether all metadata values are valid.
     """
     return (
         isinstance(modification_time_ns, int)
@@ -549,13 +575,13 @@ def _metadata_is_valid(
 
 
 def _sha256_is_valid(value: str) -> bool:
-    """Return whether a string is a lowercase-or-uppercase SHA-256 digest.
+    """Return whether a string is a lowercase-or-uppercase SHA-256 hex digest.
 
     Args:
         value:
             Candidate digest string.
 
     Returns:
-        `True` when the value contains exactly 64 hexadecimal characters.
+        Whether the value contains exactly 64 hexadecimal characters.
     """
     return len(value) == 64 and all(character in string.hexdigits for character in value)

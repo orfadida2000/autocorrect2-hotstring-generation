@@ -1,12 +1,14 @@
 {
   "cSpell.words": [
+    "hotif",
     "hotstring",
     "Hotstrings",
     "initargs",
+    "keepends",
     "MULTIPROCESSED",
     "multypo",
     "punkt",
-    "hotif",
-    "keepends"
+    "ucrtbase",
+    "wcslwr"
   ]
 }

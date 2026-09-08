@@ -7,11 +7,11 @@ separate concerns. Callers normally use [`load_existing_hotstrings()`]
 
 from .cache import DEFAULT_SOURCE_CACHE_PATH
 from .loader import load_existing_hotstrings
-from .parser import HOTSTRING_PATTERN, extract_hotstrings
+from .parser import HOTSTRING_PREFIX_PATTERN, extract_hotstrings
 
 __all__ = [
     "DEFAULT_SOURCE_CACHE_PATH",
-    "HOTSTRING_PATTERN",
+    "HOTSTRING_PREFIX_PATTERN",
     "extract_hotstrings",
     "load_existing_hotstrings",
 ]

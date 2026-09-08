@@ -1,4 +1,4 @@
-site_name: AutoCorrect2 Hotstring Generation
+site_name: AutoCorrect2 Hotstrings
 site_url: https://orfadida2000.github.io/autocorrect2-hotstring-generation/
 site_description: Generate typo-based AutoHotkey hotstrings and validate them against AutoCorrect2
 
@@ -7,6 +7,9 @@ repo_name: orfadida2000/autocorrect2-hotstring-generation
 
 theme:
   name: material
+
+  logo: assets/icons/autocorrect2-spellcheck.svg
+  favicon: assets/icons/ACicon.ico
 
   palette:
     - media: "(prefers-color-scheme: light)"
@@ -32,6 +35,7 @@ theme:
     - navigation.tracking
     - navigation.path
     - navigation.footer
+    - navigation.top
     - toc.follow
     - search.suggest
     - search.highlight
@@ -46,6 +50,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Project Background: project-background.md
   - Getting started: getting-started.md
   - Project structure: project-structure.md
 
@@ -71,27 +76,37 @@ nav:
       - Overview: api/index.md
 
       - Core:
+          - Overview: api/core/index.md
           - Models: api/core/models.md
+          - Trigger representations: api/core/trigger.md
           - Hotstring options: api/core/options.md
           - Conflict detection: api/core/conflicts.md
-          - Pipelines: api/core/pipeline.md
-          - Reports: api/core/report.md
-          - File I/O: api/core/file-io.md
           - Constants: api/core/constants.md
 
+      - Pipelines: api/pipeline.md
+      - Reports: api/report.md
+      - File I/O: api/file-io.md
+      - Constants: api/constants.md
+
       - Typo generation:
+          - Overview: api/typo-generation/index.md
           - Models: api/typo-generation/models.md
           - Generation: api/typo-generation/generation.md
           - Execution: api/typo-generation/execution.md
           - Aggregation: api/typo-generation/aggregation.md
 
       - AutoCorrect2:
+          - Overview: api/autocorrect2/index.md
           - Models: api/autocorrect2/models.md
+
           - Source loading:
-              - Parser: api/autocorrect2/parser.md
-              - Cache: api/autocorrect2/cache.md
-              - Loader: api/autocorrect2/loader.md
+              - Overview: api/autocorrect2/source_loading/index.md
+              - Parser: api/autocorrect2/source_loading/parser.md
+              - Cache: api/autocorrect2/source_loading/cache.md
+              - Loader: api/autocorrect2/source_loading/loader.md
+
           - Writer: api/autocorrect2/writer.md
+          - Integration: api/autocorrect2/integration.md
           - Constants: api/autocorrect2/constants.md
 
 plugins:
@@ -99,6 +114,8 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          inventories:
+            - https://docs.python.org/3/objects.inv
           paths:
             - .
           options:
@@ -116,7 +133,7 @@ plugins:
             scoped_crossrefs: true
             relative_crossrefs: true
             signature_crossrefs: true
-            show_if_no_docstring: true
+            show_if_no_docstring: false
 
 markdown_extensions:
   - admonition
@@ -140,4 +157,8 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/orfadida2000
-      name: GitHub profile
+      name: My GitHub
+
+    - icon: fontawesome/solid/envelope
+      link: mailto:or@fadida.net
+      name: Email

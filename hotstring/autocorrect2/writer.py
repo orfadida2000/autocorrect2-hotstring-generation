@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
+from ..core.options import SettingState
 from ..file_io import read_text, write_text
-from ..options import SettingState
 from .constants import AUTOCORRECT2_PROJECT_DIR, GENERATED_HOTSTRINGS_RELATIVE_PATH
 from .models import AutoCorrect2CandidateHotstring
 
@@ -26,9 +26,9 @@ def append_candidates(
 ) -> Path:
     """Append accepted candidates to the project-owned AutoCorrect2 include.
 
-    Each candidate must explicitly use `B0` and `X`, which are required by
-    the AutoCorrect2 `f()`-based generated form. Conflict checking itself is
-    intentionally less restrictive and does not depend on these options.
+    Each candidate must explicitly use `B0` and `X`, which are required by the
+    AutoCorrect2 `f()`-based generated form. Trigger rendering is delegated to
+    the hotstring model, which emits its canonical `ahk_trigger` source form.
 
     Args:
         candidates:
@@ -43,8 +43,7 @@ def append_candidates(
 
     Raises:
         ValueError:
-            If a candidate is not explicitly configured with `B0X` behavior
-            required by the writer.
+            If a candidate is not explicitly configured with `B0X` behavior.
         OSError:
             If the generated file cannot be read or written.
     """

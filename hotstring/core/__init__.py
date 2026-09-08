@@ -1,13 +1,9 @@
-"""AutoHotkey hotstring generation and AutoCorrect2 integration package."""
+"""Generic AutoHotkey hotstring domain model and recognition logic."""
 
-from .core import (
-    CandidateAssessment,
-    CandidateHotstring,
+from .conflicts import CandidateAssessment, ConflictKind, HotstringConflict
+from .models import CandidateHotstring, ExistingHotstring, Hotstring
+from .options import (
     CaseMode,
-    ConflictKind,
-    ExistingHotstring,
-    Hotstring,
-    HotstringConflict,
     HotstringOptions,
     InheritedState,
     ReplacementMode,
@@ -16,7 +12,7 @@ from .core import (
     SendMode,
     SettingState,
 )
-from .core.trigger import (
+from .trigger import (
     ahk_to_semantic_trigger,
     make_case_insensitive_trigger_key,
     semantic_to_ahk_trigger,

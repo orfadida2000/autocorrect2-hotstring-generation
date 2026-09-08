@@ -1,3 +1,3 @@
-# AutoCorrect2 source cache
+# Source cache
 
 ::: hotstring.autocorrect2.source_loading.cache

@@ -2,7 +2,8 @@
 
 The full workflow is deliberately implemented as composition of the typo-
 generation-only and AutoCorrect2-only workflows. Neither subsystem depends
-on the other.
+on the other, which keeps generation policy separate from AutoHotkey source
+inspection and conflict detection.
 """
 
 from __future__ import annotations
@@ -14,15 +15,12 @@ from pathlib import Path
 from typing import Final
 
 from .autocorrect2.constants import AUTOCORRECT2_PROJECT_DIR
-from .autocorrect2.models import (
-    AutoCorrect2CandidateHotstring,
-    AutoCorrect2CheckResult,
-)
+from .autocorrect2.models import AutoCorrect2CandidateHotstring, AutoCorrect2CheckResult
 from .autocorrect2.source_loading import load_existing_hotstrings
 from .autocorrect2.writer import append_candidates
-from .conflicts import assess_candidates
+from .core.conflicts import assess_candidates
+from .core.options import HotstringOptions
 from .file_io import write_text
-from .options import HotstringOptions
 from .report import (
     build_report_document,
     create_autocorrect2_report,
@@ -31,11 +29,7 @@ from .report import (
 )
 from .typo_generation.aggregation import aggregate_typo_samples
 from .typo_generation.execution import execute_typo_generation_tasks
-from .typo_generation.models import (
-    TypoGenerationConfig,
-    TypoGenerationResult,
-    TypoGenerationTask,
-)
+from .typo_generation.models import TypoGenerationConfig, TypoGenerationResult, TypoGenerationTask
 
 GENERATED_CANDIDATE_OPTIONS: Final[HotstringOptions] = HotstringOptions("B0X")
 """Options assigned when the full pipeline converts typo mappings to hotstrings."""
@@ -47,9 +41,9 @@ class FullPipelineResult:
 
     Attributes:
         typo_generation:
-            Typo-generation stage result.
+            Result of typo generation and internal ambiguity filtering.
         autocorrect2:
-            AutoCorrect2 conflict-check stage result.
+            Result of checking the surviving candidates against AutoCorrect2.
     """
 
     typo_generation: TypoGenerationResult
@@ -75,23 +69,30 @@ def run_typo_generation(
         config:
             Shared MULTYPO generator configuration.
         n_workers:
-            Optional process-pool size. Task count is independent of worker
-            count; the pool schedules all supplied tasks.
+            Optional process-pool size. `None` uses the executor default when
+            parallel execution is selected.
         report_path:
-            Optional path for a typo-generation-only report.
+            Optional destination for a typo-generation-only report.
         logger:
-            Optional orchestration logger.
+            Optional orchestration logger forwarded to the execution layer.
 
     Returns:
-        Aggregated typo-generation result.
+        Aggregated typo-generation result containing valid mappings and
+        internally ambiguous noisy forms.
 
     Raises:
+        TypeError:
+            If task/execution inputs have invalid types.
+        ValueError:
+            If no generation tasks are supplied or a generation setting is
+            invalid.
+        RuntimeError:
+            If a parallel generation task fails.
         OSError:
             If a requested report cannot be written.
     """
     words = list(word_list)
     task_tuple = tuple(tasks)
-
     samples = execute_typo_generation_tasks(
         words,
         task_tuple,
@@ -125,32 +126,38 @@ def run_autocorrect2_check(
 ) -> AutoCorrect2CheckResult:
     """Check manually supplied candidates against active AutoCorrect2 hotstrings.
 
-    This pipeline does not depend on typo generation. Accepted candidates can
-    optionally be appended to the project-owned generated include file.
+    Trigger conflict detection supports every combination of the recognition
+    options currently modeled by the project: ending-character-free matching
+    (`*`), inside-word matching (`?`), and case-sensitive matching (`C`). No
+    candidate is rejected merely for using one of those semantics.
 
     Args:
         candidates:
             AutoCorrect2 candidates supplied directly by the caller.
         project_dir:
-            AutoCorrect2 project directory.
+            AutoCorrect2 project directory containing the configured source
+            files.
         report_path:
-            Optional path for an AutoCorrect2-only report.
+            Optional destination for an AutoCorrect2-only report.
         write_accepted:
-            Append accepted candidates to the generated include file.
+            Append accepted candidates to the generated include file when
+            `True`.
 
     Returns:
-        AutoCorrect2 conflict-check result.
+        Conflict-check result partitioning candidates into accepted and
+        rejected groups.
 
     Raises:
         FileNotFoundError:
             If a required AutoCorrect2 source file is missing.
-        NotImplementedError:
-            If a candidate uses unsupported matching semantics.
+        UnicodeDecodeError:
+            If a source requiring parsing is not valid UTF-8 text.
         ValueError:
-            If writing is requested for a candidate that violates the
-            AutoCorrect2 writer's explicit `B0X` contract.
+            If source data is invalid or writing is requested for a candidate
+            that violates the writer's explicit `B0X` contract.
         OSError:
-            If source/report/generated files cannot be read or written.
+            If authoritative sources, reports, or generated files cannot be
+            read or written.
     """
     candidate_tuple = tuple(candidates)
     existing_hotstrings = load_existing_hotstrings(project_dir)
@@ -195,10 +202,11 @@ def run_full_pipeline(
 ) -> FullPipelineResult:
     """Run typo generation followed by AutoCorrect2 conflict checking.
 
-    The function reuses the two independent stage pipelines without asking
-    either stage to create its own report. Valid typo mappings are normalized
-    into `AutoCorrect2CandidateHotstring` objects with the project's fixed
-    generated `B0X` options.
+    The function composes the two independent stage pipelines without asking
+    either stage to emit its own report. Surviving typo mappings are converted
+    to [`AutoCorrect2CandidateHotstring`]
+    [hotstring.autocorrect2.models.AutoCorrect2CandidateHotstring] objects with
+    the project's fixed generated `B0X` option set.
 
     Args:
         word_list:
@@ -212,22 +220,29 @@ def run_full_pipeline(
         project_dir:
             AutoCorrect2 project directory.
         report_path:
-            Optional path for the combined report.
+            Optional destination for the combined report.
         write_accepted:
             Append final accepted candidates to the generated include file.
         logger:
             Optional typo-generation orchestration logger.
 
     Returns:
-        Combined full-pipeline result.
+        Combined result containing both stage results.
 
     Raises:
+        TypeError:
+            If generation or source-loading inputs have invalid types.
+        ValueError:
+            If generation/source data is invalid or a writable candidate
+            violates the generated-file contract.
         FileNotFoundError:
             If a required AutoCorrect2 source file is missing.
-        NotImplementedError:
-            If generated candidate matching semantics become unsupported.
+        UnicodeDecodeError:
+            If an authoritative source requiring parsing is not valid UTF-8.
+        RuntimeError:
+            If a parallel generation task fails.
         OSError:
-            If source/report/generated files cannot be read or written.
+            If source, report, or generated files cannot be read or written.
     """
     typo_result = run_typo_generation(
         word_list,
@@ -237,14 +252,16 @@ def run_full_pipeline(
         report_path=None,
         logger=logger,
     )
+
     candidates = tuple(
         AutoCorrect2CandidateHotstring(
             trigger=noisy_word,
-            options=GENERATED_CANDIDATE_OPTIONS,
+            options_input=GENERATED_CANDIDATE_OPTIONS,
             replacement=target_word,
         )
         for noisy_word, target_word in typo_result.candidates.items()
     )
+
     autocorrect2_result = run_autocorrect2_check(
         candidates,
         project_dir=project_dir,
@@ -271,13 +288,15 @@ def _write_report(path: Path, title: str, body_lines: Sequence[str]) -> None:
 
     Args:
         path:
-            Destination report path.
+            Destination report file.
         title:
             Top-level report title.
         body_lines:
-            Pipeline-specific report body.
+            Pipeline-specific report body lines.
 
     Raises:
+        ValueError:
+            If the report title is empty.
         OSError:
             If the report cannot be written.
     """

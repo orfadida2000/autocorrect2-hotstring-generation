@@ -1,10 +1,10 @@
 """Parse, normalize, and resolve AutoHotkey v2 hotstring option strings.
 
-[`HotstringOptions`][hotstring.options.HotstringOptions] is the single source
+[`HotstringOptions`][hotstring.core.options.HotstringOptions] is the single source
 of truth for interpreting per-hotstring option strings in this project.
-Omitted inheritable options are represented by
-[`InheritedState.INHERIT`][hotstring.options.InheritedState.INHERIT].
-[`ResolvedHotstringOptions`][hotstring.options.ResolvedHotstringOptions]
+Omitted inheritable options are represented by the enum member `INHERIT` of
+[`InheritedState`][hotstring.core.options.InheritedState].
+[`ResolvedHotstringOptions`][hotstring.core.options.ResolvedHotstringOptions]
 represents the corresponding fully resolved semantic state.
 """
 
@@ -85,15 +85,15 @@ class ReplacementMode(Enum):
 
 
 class SendMode(Enum):
-    """Represent the effective send mode selected for a hotstring.
+    """Represent the explicitly selected hotstring send mode.
 
     Attributes:
         INPUT:
-            Use SendInput mode.
+            Explicitly select SendInput.
         PLAY:
-            Use SendPlay mode.
+            Explicitly select SendPlay.
         EVENT:
-            Use SendEvent mode.
+            Explicitly select SendEvent.
     """
 
     INPUT = auto()
@@ -102,17 +102,17 @@ class SendMode(Enum):
 
 
 class ResolvedSendMode(Enum):
-    """Represent the effective send mode selected for a hotstring.
+    """Represent the fully resolved hotstring send behavior.
 
     Attributes:
         INPUT_WITH_PLAY_FALLBACK:
-            Use SendInput mode with SendPlay as a fallback (when SendInput is unavailable).
+            Explicit `SI`: use SendInput with SendPlay fallback.
         INPUT_WITH_EVENT_FALLBACK:
-            Use SendInput mode with SendEvent as a fallback (when SendInput is unavailable).
+            Built-in default: use SendInput with SendEvent fallback.
         PLAY:
-            Use SendPlay mode.
+            Use SendPlay.
         EVENT:
-            Use SendEvent mode.
+            Use SendEvent.
     """
 
     INPUT_WITH_PLAY_FALLBACK = auto()
@@ -121,7 +121,6 @@ class ResolvedSendMode(Enum):
     EVENT = auto()
 
 
-# Map non-numeric option text to its corresponding HotstringOptions field.
 _NON_NUMERIC_OPTION_FIELD_NAME: Final[dict[str, str]] = {
     "*": "ending_character_optional",
     "*0": "ending_character_optional",
@@ -195,42 +194,24 @@ class HotstringOptions:
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "*",
-                SettingState.DISABLED: "*0",
-            },
-            "str_to_value": {
-                "*": SettingState.ENABLED,
-                "*0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "*", SettingState.DISABLED: "*0"},
+            "str_to_value": {"*": SettingState.ENABLED, "*0": SettingState.DISABLED},
         },
     )
     trigger_inside_word: SettingState | InheritedState = field(
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "?",
-                SettingState.DISABLED: "?0",
-            },
-            "str_to_value": {
-                "?": SettingState.ENABLED,
-                "?0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "?", SettingState.DISABLED: "?0"},
+            "str_to_value": {"?": SettingState.ENABLED, "?0": SettingState.DISABLED},
         },
     )
     automatic_backspacing: SettingState | InheritedState = field(
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "B",
-                SettingState.DISABLED: "B0",
-            },
-            "str_to_value": {
-                "B": SettingState.ENABLED,
-                "B0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "B", SettingState.DISABLED: "B0"},
+            "str_to_value": {"B": SettingState.ENABLED, "B0": SettingState.DISABLED},
         },
     )
     case_mode: CaseMode | InheritedState = field(
@@ -258,14 +239,8 @@ class HotstringOptions:
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "O",
-                SettingState.DISABLED: "O0",
-            },
-            "str_to_value": {
-                "O": SettingState.ENABLED,
-                "O0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "O", SettingState.DISABLED: "O0"},
+            "str_to_value": {"O": SettingState.ENABLED, "O0": SettingState.DISABLED},
         },
     )
     priority: int | InheritedState = field(
@@ -294,14 +269,8 @@ class HotstringOptions:
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "S",
-                SettingState.DISABLED: "S0",
-            },
-            "str_to_value": {
-                "S": SettingState.ENABLED,
-                "S0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "S", SettingState.DISABLED: "S0"},
+            "str_to_value": {"S": SettingState.ENABLED, "S0": SettingState.DISABLED},
         },
     )
     send_mode: SendMode | InheritedState = field(
@@ -324,28 +293,16 @@ class HotstringOptions:
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "X",
-                SettingState.DISABLED: "X0",
-            },
-            "str_to_value": {
-                "X": SettingState.ENABLED,
-                "X0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "X", SettingState.DISABLED: "X0"},
+            "str_to_value": {"X": SettingState.ENABLED, "X0": SettingState.DISABLED},
         },
     )
     reset_recognizer: SettingState | InheritedState = field(
         init=False,
         default=InheritedState.INHERIT,
         metadata={
-            "value_to_str": {
-                SettingState.ENABLED: "Z",
-                SettingState.DISABLED: "Z0",
-            },
-            "str_to_value": {
-                "Z": SettingState.ENABLED,
-                "Z0": SettingState.DISABLED,
-            },
+            "value_to_str": {SettingState.ENABLED: "Z", SettingState.DISABLED: "Z0"},
+            "str_to_value": {"Z": SettingState.ENABLED, "Z0": SettingState.DISABLED},
         },
     )
 
@@ -372,7 +329,6 @@ class HotstringOptions:
 
         while position < len(options):
             match = _OPTION_PATTERN.match(options, position)
-
             if match is None:
                 raise ValueError(
                     f"Invalid hotstring option at position {position}: {options[position:]!r}"
@@ -397,10 +353,10 @@ class HotstringOptions:
                 object.__setattr__(self, "priority", priority)
 
             else:
-                if option not in _NON_NUMERIC_OPTION_FIELD_NAME:
+                field_name = _NON_NUMERIC_OPTION_FIELD_NAME.get(option)
+                if field_name is None:
                     raise AssertionError(f"Unhandled hotstring option: {option!r}")
 
-                field_name = _NON_NUMERIC_OPTION_FIELD_NAME[option]
                 field_info = field_name_to_info[field_name]
                 str_to_value = field_info.metadata.get("str_to_value", {})
                 value = str_to_value.get(option)
@@ -453,7 +409,7 @@ class HotstringOptions:
 class ResolvedHotstringOptions:
     """Represent a fully resolved AutoHotkey hotstring option state.
 
-    Unlike [`HotstringOptions`][hotstring.options.HotstringOptions], every
+    Unlike [`HotstringOptions`][hotstring.core.options.HotstringOptions], every
     field contains a concrete semantic value. `InheritedState` is therefore
     absent from every field annotation.
 
@@ -505,7 +461,7 @@ class ResolvedHotstringOptions:
             TypeError:
                 If any field has an invalid type.
             ValueError:
-                If any numeric field is outside the signed 32-bit range.
+                If any numeric field is outside its accepted range.
         """
         binary_field_names = (
             "ending_character_optional",
@@ -521,25 +477,21 @@ class ResolvedHotstringOptions:
             raise TypeError(
                 f"case_mode must be a CaseMode member, got {type(self.case_mode).__name__}"
             )
-
-        if not isinstance(self.key_delay, int):
+        if isinstance(self.key_delay, bool) or not isinstance(self.key_delay, int):
             raise TypeError(f"key_delay must be an int, got {type(self.key_delay).__name__}")
         if not -1 <= self.key_delay <= _INT32_MAX:
             raise ValueError(f"key_delay must be between -1 and {_INT32_MAX}, got {self.key_delay}")
-
-        if not isinstance(self.priority, int):
+        if isinstance(self.priority, bool) or not isinstance(self.priority, int):
             raise TypeError(f"priority must be an int, got {type(self.priority).__name__}")
         if not _INT32_MIN <= self.priority <= _INT32_MAX:
             raise ValueError(
                 f"priority must not be outside the signed 32-bit range, got {self.priority}"
             )
-
         if not isinstance(self.replacement_mode, ReplacementMode):
             raise TypeError(
-                f"replacement_mode must be a ReplacementMode member, got "
+                "replacement_mode must be a ReplacementMode member, got "
                 f"{type(self.replacement_mode).__name__}"
             )
-
         if not isinstance(self.send_mode, ResolvedSendMode):
             raise TypeError(
                 f"send_mode must be a ResolvedSendMode member, got {type(self.send_mode).__name__}"
@@ -563,9 +515,11 @@ class ResolvedHotstringOptions:
 
         Each explicitly set value in `options` overrides the corresponding
         value in `defaults`; each `InheritedState.INHERIT` value leaves the
-        applicable default unchanged. The operation is field-driven, so later
-        positional default sources such as `#Hotstring` can be represented by
-        passing the resolved defaults that apply at that declaration point.
+        applicable default unchanged.
+
+        Explicit `SI` is resolved to SendInput with SendPlay fallback, while
+        an inherited built-in default can remain SendInput with SendEvent
+        fallback. This preserves AutoHotkey's distinction between those cases.
 
         Args:
             options:
@@ -601,10 +555,22 @@ class ResolvedHotstringOptions:
                 "HotstringOptions and ResolvedHotstringOptions option fields are inconsistent."
             )
 
-        overrides = {
-            name: value
-            for name in resolved_field_names
-            if (value := getattr(options, name)) is not InheritedState.INHERIT
-        }
+        overrides: dict[str, object] = {}
+        for name in resolved_field_names:
+            value = getattr(options, name)
+            if value is InheritedState.INHERIT:
+                continue
+
+            if name == "send_mode":
+                if value is SendMode.INPUT:
+                    overrides[name] = ResolvedSendMode.INPUT_WITH_PLAY_FALLBACK
+                elif value is SendMode.PLAY:
+                    overrides[name] = ResolvedSendMode.PLAY
+                elif value is SendMode.EVENT:
+                    overrides[name] = ResolvedSendMode.EVENT
+                else:
+                    raise RuntimeError(f"Unhandled explicit send mode: {value!r}")
+            else:
+                overrides[name] = value
 
         return cast(Self, replace(defaults, **overrides))

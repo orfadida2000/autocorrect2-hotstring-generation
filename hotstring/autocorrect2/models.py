@@ -4,16 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..conflicts import CandidateAssessment
-from ..models import CandidateHotstring
+from ..core.conflicts import CandidateAssessment
+from ..core.models import CandidateHotstring
 
 
 @dataclass(frozen=True, slots=True)
 class AutoCorrect2CandidateHotstring(CandidateHotstring):
     """Represent a candidate rendered using AutoCorrect2's `f()` helper.
 
-    The semantic replacement is converted to a safe AutoHotkey string
-    literal and passed as the single argument to `f()`.
+    The inherited constructor `trigger` input is semantic trigger text. The
+    semantic replacement is converted to a safe AutoHotkey string literal and
+    passed as the single argument to `f()`.
     """
 
     def compute_content(self, replacement: str) -> str:

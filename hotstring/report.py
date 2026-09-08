@@ -24,7 +24,6 @@ def create_typo_generation_report(result: TypoGenerationResult) -> list[str]:
         Report body as individual text lines.
     """
     horizontal_weight, vertical_weight = result.config.horizontal_vs_vertical
-
     lines = [
         "TYPO GENERATION",
         "-" * 80,
@@ -66,12 +65,14 @@ def create_typo_generation_report(result: TypoGenerationResult) -> list[str]:
             lines.extend(f"  -> {target!r}" for target in targets)
     else:
         lines.append("None")
-
     return lines
 
 
 def create_autocorrect2_report(result: AutoCorrect2CheckResult) -> list[str]:
     """Create the AutoCorrect2 conflict-check report body.
+
+    Candidate names are displayed with their semantic trigger, while an
+    existing conflict's rendered source line uses its canonical AHK trigger.
 
     Args:
         result:
@@ -93,7 +94,8 @@ def create_autocorrect2_report(result: AutoCorrect2CheckResult) -> list[str]:
 
     if result.accepted:
         lines.extend(
-            f"{candidate.trigger!r} -> {candidate.replacement!r}" for candidate in result.accepted
+            f"{candidate.semantic_trigger!r} -> {candidate.replacement!r}"
+            for candidate in result.accepted
         )
     else:
         lines.append("None")
@@ -105,7 +107,7 @@ def create_autocorrect2_report(result: AutoCorrect2CheckResult) -> list[str]:
 
     for assessment in result.rejected:
         candidate = assessment.candidate
-        lines.append(f"{candidate.trigger!r} -> {candidate.replacement!r}")
+        lines.append(f"{candidate.semantic_trigger!r} -> {candidate.replacement!r}")
         for conflict in assessment.conflicts:
             lines.extend(
                 (
@@ -116,7 +118,6 @@ def create_autocorrect2_report(result: AutoCorrect2CheckResult) -> list[str]:
                     "",
                 )
             )
-
     return lines
 
 
@@ -124,17 +125,7 @@ def create_full_pipeline_report(
     typo_result: TypoGenerationResult,
     autocorrect2_result: AutoCorrect2CheckResult,
 ) -> list[str]:
-    """Create a full report by composing both stage-specific report bodies.
-
-    Args:
-        typo_result:
-            Typo-generation stage result.
-        autocorrect2_result:
-            AutoCorrect2 conflict-check stage result.
-
-    Returns:
-        Combined report body with a final pipeline summary.
-    """
+    """Create a full report by composing both stage-specific report bodies."""
     lines = create_typo_generation_report(typo_result)
     lines.extend(("", "=" * 80, ""))
     lines.extend(create_autocorrect2_report(autocorrect2_result))
@@ -148,31 +139,11 @@ def create_full_pipeline_report(
             f"Final accepted hotstrings: {len(autocorrect2_result.accepted)}",
         )
     )
-
     return lines
 
 
 def build_report_document(title: str, body_lines: Sequence[str]) -> list[str]:
-    """Wrap a report body with run-level document framing.
-
-    No timestamp or other volatile metadata is currently added. Future
-    document-level metadata belongs here so it appears exactly once even for
-    composed full-pipeline reports.
-
-    Args:
-        title:
-            Top-level report title.
-        body_lines:
-            Already formatted body lines.
-
-    Returns:
-        Complete document lines.
-
-    Raises:
-        ValueError:
-            If `title` is empty.
-    """
+    """Wrap a report body with run-level document framing."""
     if not title:
         raise ValueError("Report title cannot be empty.")
-
     return [title, "=" * 80, "", *body_lines]

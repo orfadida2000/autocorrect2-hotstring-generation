@@ -7,4 +7,4 @@ The declared send mode uses `SendMode` (`INPUT`, `PLAY`, and `EVENT`). Fully
 resolved options use the separate `ResolvedSendMode` enum so Input's Play and
 Event fallback behaviors remain explicit without complicating the field type.
 
-::: hotstring.options
+::: hotstring.core.options

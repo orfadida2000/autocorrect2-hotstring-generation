@@ -8,21 +8,28 @@ autocorrect2-hotstring-generation/
 │   ├── configuration/
 │   └── workflows/
 ├── hotstring/
-│   ├── autocorrect2/
+│   ├── core/
 │   │   ├── constants.py
+│   │   ├── conflicts.py
 │   │   ├── models.py
-│   │   ├── parser.py
+│   │   ├── options.py
+│   │   └── trigger.py
+│   ├── autocorrect2/
+│   │   ├── source_loading/
+│   │   │   ├── cache.py
+│   │   │   ├── loader.py
+│   │   │   └── parser.py
+│   │   ├── constants.py
+│   │   ├── integration.py
+│   │   ├── models.py
 │   │   └── writer.py
 │   ├── typo_generation/
 │   │   ├── aggregation.py
 │   │   ├── execution.py
 │   │   ├── generation.py
 │   │   └── models.py
-│   ├── conflicts.py
 │   ├── constants.py
 │   ├── file_io.py
-│   ├── models.py
-│   ├── options.py
 │   ├── pipeline.py
 │   └── report.py
 ├── main.py
@@ -30,12 +37,10 @@ autocorrect2-hotstring-generation/
 └── pyproject.toml
 ```
 
-Generic AutoHotkey behavior lives directly under `hotstring/`.
+Generic AutoHotkey hotstring behavior lives under `hotstring/core/`.
 AutoCorrect2-specific knowledge is isolated under `hotstring/autocorrect2/`,
-while typo generation remains independent under
-`hotstring/typo_generation/`.
+with source loading further separated into its own subpackage. Typo generation
+remains independent under `hotstring/typo_generation/`.
 
-The option model is also generic: `HotstringOptions` represents the declaration
-as written, while `ResolvedHotstringOptions` represents the effective option
-state after inheritance has been resolved for a particular declaration
-position.
+Top-level `hotstring` modules are reserved for project-level orchestration and
+infrastructure rather than the generic hotstring domain model.

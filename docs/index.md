@@ -7,10 +7,16 @@ file.
 
 The project deliberately separates three concerns:
 
-- generic AutoHotkey hotstring parsing, rendering, option resolution, and conflict semantics;
-- typo generation and internal ambiguity filtering;
-- AutoCorrect2-specific parsing, candidate rendering, and output writing.
+- `hotstring.core` — generic AutoHotkey hotstring models, trigger conversion,
+  option resolution, and conflict semantics;
+- `hotstring.typo_generation` — typo generation and internal ambiguity
+  filtering;
+- `hotstring.autocorrect2` — AutoCorrect2-specific source loading, candidate
+  rendering, integration checks, and generated-file writing.
 
-The two processing stages can be used independently. Typo generation does not
+Project-level orchestration, reporting, and generic file I/O remain at the
+`hotstring` package root.
+
+The processing stages can be used independently. Typo generation does not
 depend on AutoCorrect2, and AutoCorrect2 checking can operate on manually
 constructed candidates.

@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Final
 
-from ...models import ExistingHotstring
+from ...core.models import ExistingHotstring
 from ..constants import (
     AUTOCORRECT2_PROJECT_DIR,
     OPTIONAL_HOTSTRING_SOURCE_RELATIVE_PATHS,
@@ -71,7 +71,7 @@ def load_existing_hotstrings(
         UnicodeDecodeError:
             If a changed source is not valid UTF-8 text.
         ValueError:
-            If a parsed hotstring option string is invalid.
+            If a parsed hotstring declaration is invalid.
         OSError:
             If an authoritative source cannot be inspected or read.
     """
@@ -109,12 +109,16 @@ def load_existing_hotstrings(
     for relative_path in optional_source_paths:
         file_path = project_dir / relative_path
         if not file_path.is_file():
-            LOGGER.debug("Optional hotstring source is absent and will be skipped: %s.", file_path)
+            LOGGER.debug(
+                "Optional hotstring source is absent and will be skipped: %s.",
+                file_path,
+            )
             if cache is not None:
                 source_key = source_cache_key(relative_path)
                 if cache.files.pop(source_key, None) is not None:
                     LOGGER.debug(
-                        "Removed stale cache entry for absent optional source %s.", relative_path
+                        "Removed stale cache entry for absent optional source %s.",
+                        relative_path,
                     )
                     cache_dirty = True
             continue
@@ -167,7 +171,7 @@ def _load_source_hotstrings(
         UnicodeDecodeError:
             If source bytes requiring parsing are not valid UTF-8 text.
         ValueError:
-            If a parsed hotstring option string is invalid.
+            If a parsed hotstring declaration is invalid.
         OSError:
             If the source cannot be inspected or read.
     """
@@ -192,7 +196,7 @@ def _load_source_hotstrings(
 
     if source_stat.st_size != cached_entry.size:
         LOGGER.debug(
-            "Source size changed for %s (%d -> %d); reparsing without hash comparison.",
+            "Source size changed for %s (%d -> %d); reparsing without old-hash comparison.",
             source,
             cached_entry.size,
             source_stat.st_size,
@@ -206,10 +210,7 @@ def _load_source_hotstrings(
         )
 
     if source_stat.st_mtime_ns != cached_entry.modification_time_ns:
-        LOGGER.debug(
-            "Source modification time changed for %s; verifying content hash.",
-            source,
-        )
+        LOGGER.debug("Source modification time changed for %s; verifying content hash.", source)
     else:
         LOGGER.debug(
             "Source size and modification time match cache for %s; verifying content hash anyway.",
@@ -306,7 +307,7 @@ def _parse_and_refresh_source(
         UnicodeDecodeError:
             If source bytes are not valid UTF-8 text.
         ValueError:
-            If a parsed hotstring option string is invalid.
+            If a parsed hotstring declaration is invalid.
         OSError:
             If source bytes must be read and the read fails.
     """
@@ -354,7 +355,7 @@ def _parse_source_content(content: bytes, *, source: Path) -> list[ExistingHotst
         UnicodeDecodeError:
             If the source is not valid UTF-8 text.
         ValueError:
-            If an extracted hotstring option string is invalid.
+            If an extracted hotstring declaration is invalid.
     """
     LOGGER.debug("Decoding authoritative source %s for parsing.", source)
     return extract_hotstrings(content.decode("utf-8-sig"), source=source)

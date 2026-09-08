@@ -96,24 +96,15 @@ DEFAULT_MIXED_ERROR_TYPO_DISTRIBUTION = TypoWeightDistribution(
 class TypoGenerationTask:
     """Describe one independently executable typo-generation task.
 
-    A task contains only settings that may reasonably vary between work items.
-    The source word list and keyboard/generator environment are shared by all
-    tasks in a generation run.
-
     Attributes:
         distribution:
             Typo-operation distribution used by the task.
         typo_rate:
-            MULTYPO typo rate passed directly to `insert_typos`. For a
-            single-word input, `1.0` requests one typo operation and `2.0`
-            requests two operations.
+            MULTYPO typo rate passed directly to `insert_typos`.
         generation_attempts_per_word:
-            Number of independent MULTYPO samples requested for each eligible
-            source word.
+            Number of independent samples requested for each eligible word.
         minimum_word_length:
-            Minimum source-word length eligible for this task. This allows
-            multi-error tasks to exclude short words without duplicating the
-            source word collection.
+            Minimum source-word length eligible for this task.
     """
 
     distribution: TypoWeightDistribution
@@ -128,27 +119,23 @@ class TypoGenerationTask:
             TypeError:
                 If a field has an invalid type.
             ValueError:
-                If the typo rate, attempt count, or minimum length is not
-                positive enough to be meaningful.
+                If the typo rate, attempt count, or minimum length is invalid.
         """
         if not isinstance(self.distribution, TypoWeightDistribution):
             raise TypeError(
-                "distribution must be a TypoDistribution instance, "
+                "distribution must be a TypoWeightDistribution instance, "
                 f"not {type(self.distribution).__name__}."
             )
-
         if isinstance(self.typo_rate, bool) or not isinstance(self.typo_rate, Real):
             raise TypeError("typo_rate must be a real number.")
         if self.typo_rate <= 0:
             raise ValueError("typo_rate must be greater than zero.")
-
         if isinstance(self.generation_attempts_per_word, bool) or not isinstance(
             self.generation_attempts_per_word, int
         ):
             raise TypeError("generation_attempts_per_word must be an integer.")
         if self.generation_attempts_per_word <= 0:
             raise ValueError("generation_attempts_per_word must be greater than zero.")
-
         if isinstance(self.minimum_word_length, bool) or not isinstance(
             self.minimum_word_length, int
         ):
@@ -160,9 +147,6 @@ class TypoGenerationTask:
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TypoGenerationConfig:
     """Configure generator settings shared by every task in one run.
-
-    Execution mechanics such as worker count and task-specific sampling
-    settings are deliberately kept outside this model.
 
     Attributes:
         language:
@@ -178,22 +162,13 @@ class TypoGenerationConfig:
     horizontal_vs_vertical: tuple[float, float] = (9.0, 1.0)
 
     def __post_init__(self) -> None:
-        """Validate shared typo-generation configuration.
-
-        Raises:
-            TypeError:
-                If a configuration value has an invalid type.
-            ValueError:
-                If the language is empty or keyboard weights are invalid.
-        """
+        """Validate shared typo-generation configuration."""
         if not isinstance(self.language, str):
             raise TypeError("language must be a string.")
         if not self.language:
             raise ValueError("language cannot be empty.")
-
         if not isinstance(self.use_excluding_set, bool):
             raise TypeError("use_excluding_set must be a boolean.")
-
         if not isinstance(self.horizontal_vs_vertical, tuple):
             raise TypeError("horizontal_vs_vertical must be a tuple.")
         if len(self.horizontal_vs_vertical) != 2:
@@ -213,15 +188,9 @@ def create_default_typo_generation_tasks(
 ) -> tuple[TypoGenerationTask, ...]:
     """Create the project's default single- and two-error task set.
 
-    The four single-error tasks force one MULTYPO operation type each with
-    `typo_rate=1.0`. A fifth mixed task requests two typo operations per word
-    with `typo_rate=2.0`. Sampling budgets and the multi-error minimum word
-    length remain caller-controlled rather than being hidden policy constants.
-
     Args:
         single_error_attempts_per_word:
-            Sampling attempts per eligible word for each forced single-error
-            task.
+            Sampling attempts per eligible word for each forced single-error task.
         multi_error_attempts_per_word:
             Sampling attempts per eligible word for the mixed two-error task.
         multi_error_minimum_word_length:
@@ -229,12 +198,6 @@ def create_default_typo_generation_tasks(
 
     Returns:
         Ordered default task tuple.
-
-    Raises:
-        TypeError:
-            If an argument has an invalid type.
-        ValueError:
-            If an argument violates `TypoGenerationTask` validation.
     """
     single_error_tasks = tuple(
         TypoGenerationTask(
@@ -245,14 +208,12 @@ def create_default_typo_generation_tasks(
         )
         for distribution in DEFAULT_SINGLE_ERROR_TYPO_DISTRIBUTIONS
     )
-
     multi_error_task = TypoGenerationTask(
         distribution=DEFAULT_MIXED_ERROR_TYPO_DISTRIBUTION,
         typo_rate=2.0,
         generation_attempts_per_word=multi_error_attempts_per_word,
         minimum_word_length=multi_error_minimum_word_length,
     )
-
     return (*single_error_tasks, multi_error_task)
 
 

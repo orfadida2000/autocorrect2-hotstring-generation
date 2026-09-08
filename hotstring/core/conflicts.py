@@ -1,21 +1,26 @@
 """Detect trigger-recognition conflicts between candidate and existing hotstrings.
 
-Candidate support is intentionally limited only by matching semantics that
-the current algorithm has not implemented. Options unrelated to trigger
-recognition, such as backspacing, execution, priority, send mode, or
-replacement mode, do not affect whether conflict checking is supported.
+Conflict detection models the three trigger-recognition dimensions relevant to
+whether two hotstrings can activate on overlapping typed text:
+
+- case sensitivity (`C` / `C0` / `C1`);
+- whether an alphanumeric predecessor is permitted (`?` / `?0`);
+- whether an ending character is required (`*` / `*0`).
+
+Other hotstring options affect replacement or execution behavior rather than
+trigger recognition and therefore do not restrict conflict checking.
 """
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from enum import Enum
 
 from .constants import DEFAULT_ENDING_CHARS, DEFAULT_HOTSTRING_OPTIONS
-from .models import CandidateHotstring, ExistingHotstring
+from .models import CandidateHotstring, ExistingHotstring, Hotstring
 from .options import CaseMode, ResolvedHotstringOptions, SettingState
+from .trigger import make_case_insensitive_trigger_key
 
 
 class ConflictKind(Enum):
@@ -23,13 +28,14 @@ class ConflictKind(Enum):
 
     Attributes:
         SAME_TRIGGER:
-            Candidate and existing definitions overlap on the same trigger.
+            Candidate and existing definitions can recognize the same complete
+            trigger text.
         EXISTING_FIRES_DURING_CANDIDATE:
-            The existing definition can become eligible while the candidate
-            trigger is being typed.
+            The existing definition can become eligible while a valid typed
+            form of the candidate trigger is being entered.
         CANDIDATE_FIRES_DURING_EXISTING:
-            The candidate can become eligible while the existing trigger is
-            being typed.
+            The candidate can become eligible while a valid typed form of the
+            existing trigger is being entered.
     """
 
     SAME_TRIGGER = "same trigger"
@@ -92,9 +98,9 @@ class _TriggerOverlap:
 
     Attributes:
         start:
-            Inclusive start index inside the containing trigger.
+            Inclusive start index inside the containing semantic trigger.
         end:
-            Exclusive end index inside the containing trigger.
+            Exclusive end index inside the containing semantic trigger.
         left_reason:
             Explanation of the valid left boundary.
         right_reason:
@@ -125,6 +131,9 @@ def find_conflict(
 ) -> HotstringConflict | None:
     """Check one candidate against one existing hotstring.
 
+    All combinations of case sensitivity, inside-word recognition, and
+    ending-character requirements are supported for both definitions.
+
     Args:
         candidate:
             Candidate to check.
@@ -137,23 +146,17 @@ def find_conflict(
 
     Returns:
         Detected conflict, or `None` when the pair does not conflict.
-
-    Raises:
-        NotImplementedError:
-            If the candidate uses unsupported effective matching semantics.
     """
     candidate_options = ResolvedHotstringOptions.from_options(
         candidate.options,
         defaults=option_defaults,
     )
-    _ensure_supported_candidate_matching(candidate_options)
-
     existing_options = ResolvedHotstringOptions.from_options(
         existing.options,
         defaults=option_defaults,
     )
 
-    return _find_supported_candidate_conflict(
+    return _find_candidate_conflict(
         candidate,
         candidate_options,
         existing,
@@ -183,16 +186,11 @@ def assess_candidate(
 
     Returns:
         Complete candidate assessment.
-
-    Raises:
-        NotImplementedError:
-            If the candidate uses unsupported effective matching semantics.
     """
     candidate_options = ResolvedHotstringOptions.from_options(
         candidate.options,
         defaults=option_defaults,
     )
-    _ensure_supported_candidate_matching(candidate_options)
 
     conflicts: list[HotstringConflict] = []
     for existing in existing_hotstrings:
@@ -200,7 +198,7 @@ def assess_candidate(
             existing.options,
             defaults=option_defaults,
         )
-        conflict = _find_supported_candidate_conflict(
+        conflict = _find_candidate_conflict(
             candidate,
             candidate_options,
             existing,
@@ -232,16 +230,12 @@ def assess_candidates(
         existing_hotstrings:
             Existing definitions to compare against.
         ending_chars:
-            Effective AutoHotkey ending-character set.
+            Effective ending-character set.
         option_defaults:
             Fully resolved defaults applicable to inherited hotstring options.
 
     Returns:
         Candidate assessments in input order.
-
-    Raises:
-        NotImplementedError:
-            If any candidate uses unsupported effective matching semantics.
     """
     return tuple(
         assess_candidate(
@@ -254,34 +248,7 @@ def assess_candidates(
     )
 
 
-def _ensure_supported_candidate_matching(options: ResolvedHotstringOptions) -> None:
-    """Validate that candidate recognition semantics are implemented.
-
-    Args:
-        options:
-            Fully resolved candidate options.
-
-    Raises:
-        NotImplementedError:
-            If the candidate omits the ending-character requirement, permits
-            inside-word matching, or matches case-sensitively.
-    """
-    unsupported: list[str] = []
-    if options.ending_character_optional is SettingState.ENABLED:
-        unsupported.append("ending-character-free matching ('*')")
-    if options.trigger_inside_word is SettingState.ENABLED:
-        unsupported.append("inside-word matching ('?')")
-    if options.case_mode is CaseMode.SENSITIVE:
-        unsupported.append("case-sensitive matching ('C')")
-
-    if unsupported:
-        raise NotImplementedError(
-            "Conflict checking is not yet implemented for candidate matching "
-            "semantics using " + ", ".join(unsupported) + "."
-        )
-
-
-def _find_supported_candidate_conflict(
+def _find_candidate_conflict(
     candidate: CandidateHotstring,
     candidate_options: ResolvedHotstringOptions,
     existing: ExistingHotstring,
@@ -289,11 +256,11 @@ def _find_supported_candidate_conflict(
     *,
     ending_chars: frozenset[str],
 ) -> HotstringConflict | None:
-    """Check one existing definition against a supported candidate.
+    """Check one existing definition against one candidate.
 
     Args:
         candidate:
-            Candidate whose matching semantics are supported.
+            Candidate definition.
         candidate_options:
             Fully resolved candidate options.
         existing:
@@ -306,28 +273,37 @@ def _find_supported_candidate_conflict(
     Returns:
         Detected conflict, or `None`.
     """
-    if candidate.trigger.casefold() == existing.trigger.casefold():
+    candidate_case_sensitive = candidate_options.case_mode is CaseMode.SENSITIVE
+    existing_case_sensitive = existing_options.case_mode is CaseMode.SENSITIVE
+
+    if _same_trigger_can_match(
+        candidate,
+        candidate_case_sensitive=candidate_case_sensitive,
+        existing=existing,
+        existing_case_sensitive=existing_case_sensitive,
+    ):
         return HotstringConflict(
             candidate=candidate,
             existing=existing,
             kind=ConflictKind.SAME_TRIGGER,
             reason=(
-                "The candidate and existing hotstring have the same "
-                "case-insensitive trigger."
+                "The candidate and existing hotstring can recognize the same "
+                "complete trigger text."
             ),
         )
 
     existing_overlap = next(
         _iter_trigger_overlaps(
-            trigger=existing.trigger,
-            container=candidate.trigger,
+            trigger=existing,
+            container=candidate,
             allow_alphanumeric_predecessor=(
                 existing_options.trigger_inside_word is SettingState.ENABLED
             ),
             require_ending_character=(
                 existing_options.ending_character_optional is SettingState.DISABLED
             ),
-            case_sensitive=existing_options.case_mode is CaseMode.SENSITIVE,
+            trigger_case_sensitive=existing_case_sensitive,
+            container_case_sensitive=candidate_case_sensitive,
             ending_chars=ending_chars,
         ),
         None,
@@ -345,15 +321,16 @@ def _find_supported_candidate_conflict(
 
     candidate_overlap = next(
         _iter_trigger_overlaps(
-            trigger=candidate.trigger,
-            container=existing.trigger,
+            trigger=candidate,
+            container=existing,
             allow_alphanumeric_predecessor=(
                 candidate_options.trigger_inside_word is SettingState.ENABLED
             ),
             require_ending_character=(
                 candidate_options.ending_character_optional is SettingState.DISABLED
             ),
-            case_sensitive=candidate_options.case_mode is CaseMode.SENSITIVE,
+            trigger_case_sensitive=candidate_case_sensitive,
+            container_case_sensitive=existing_case_sensitive,
             ending_chars=ending_chars,
         ),
         None,
@@ -372,45 +349,95 @@ def _find_supported_candidate_conflict(
     return None
 
 
+def _same_trigger_can_match(
+    candidate: Hotstring,
+    *,
+    candidate_case_sensitive: bool,
+    existing: Hotstring,
+    existing_case_sensitive: bool,
+) -> bool:
+    """Return whether two complete trigger definitions share a typed form.
+
+    If both hotstrings are case-sensitive, their semantic triggers must match
+    exactly. If either definition is case-insensitive, a shared casing exists
+    whenever their AutoHotkey-compatible case-insensitive keys are equal.
+
+    Args:
+        candidate:
+            First hotstring.
+        candidate_case_sensitive:
+            Whether the first hotstring requires exact case.
+        existing:
+            Second hotstring.
+        existing_case_sensitive:
+            Whether the second hotstring requires exact case.
+
+    Returns:
+        Whether the two complete trigger definitions can recognize the same
+        typed text.
+    """
+    if candidate_case_sensitive and existing_case_sensitive:
+        return candidate.semantic_trigger == existing.semantic_trigger
+
+    return (
+        candidate.case_insensitive_semantic_trigger_key
+        == existing.case_insensitive_semantic_trigger_key
+    )
+
+
 def _iter_trigger_overlaps(
     *,
-    trigger: str,
-    container: str,
+    trigger: Hotstring,
+    container: Hotstring,
     allow_alphanumeric_predecessor: bool,
     require_ending_character: bool,
-    case_sensitive: bool,
+    trigger_case_sensitive: bool,
+    container_case_sensitive: bool,
     ending_chars: frozenset[str],
 ) -> Iterator[_TriggerOverlap]:
-    """Yield occurrences satisfying both trigger-recognition boundaries.
+    """Yield occurrences satisfying trigger recognition and both boundaries.
+
+    `trigger` is the hotstring whose ability to activate is being tested.
+    `container` is the other hotstring whose trigger is being typed.
+
+    Case handling must consider *both* definitions. If both are case-sensitive,
+    only the exact source-defined casing of the container is a valid typed
+    form. If either is case-insensitive, a shared casing can exist for an
+    occurrence whenever the corresponding case-insensitive keys match.
 
     Args:
         trigger:
-            Trigger whose activation is being tested.
+            Hotstring whose activation is being tested.
         container:
-            Other trigger being typed around it.
+            Other hotstring whose semantic trigger is being typed around it.
         allow_alphanumeric_predecessor:
-            Whether an alphanumeric predecessor is permitted.
+            Whether the tested hotstring permits an alphanumeric predecessor.
         require_ending_character:
-            Whether activation requires an ending character.
-        case_sensitive:
-            Whether exact trigger casing is required.
+            Whether the tested hotstring requires an ending character.
+        trigger_case_sensitive:
+            Whether the tested hotstring requires exact trigger casing.
+        container_case_sensitive:
+            Whether the containing hotstring requires exact trigger casing.
         ending_chars:
             Effective ending-character set.
 
     Yields:
         Every boundary-valid occurrence.
     """
-    if len(trigger) > len(container):
+    if len(trigger.semantic_trigger) > len(container.semantic_trigger):
         return
 
-    for start in _iter_occurrence_starts(
+    require_exact_case = trigger_case_sensitive and container_case_sensitive
+
+    for start in _iter_hotstring_occurrence_starts(
         trigger=trigger,
         container=container,
-        case_sensitive=case_sensitive,
+        require_exact_case=require_exact_case,
     ):
-        end = start + len(trigger)
+        end = start + len(trigger.semantic_trigger)
+
         left_reason = _left_boundary_reason(
-            container=container,
+            container=container.semantic_trigger,
             start=start,
             allow_alphanumeric_predecessor=allow_alphanumeric_predecessor,
         )
@@ -418,7 +445,7 @@ def _iter_trigger_overlaps(
             continue
 
         right_reason = _right_boundary_reason(
-            container=container,
+            container=container.semantic_trigger,
             end=end,
             require_ending_character=require_ending_character,
             ending_chars=ending_chars,
@@ -434,26 +461,78 @@ def _iter_trigger_overlaps(
         )
 
 
-def _iter_occurrence_starts(
-    *, trigger: str, container: str, case_sensitive: bool
+def _iter_hotstring_occurrence_starts(
+    *,
+    trigger: Hotstring,
+    container: Hotstring,
+    require_exact_case: bool,
 ) -> Iterator[int]:
-    """Yield every trigger occurrence start, including overlaps.
+    """Yield semantic occurrence starts under the required case semantics.
+
+    The normal Windows path searches the already cached semantic or
+    case-insensitive trigger strings directly. A defensive fallback preserves
+    original semantic indices if a non-Windows `str.lower()` transformation
+    changes Unicode string length.
 
     Args:
         trigger:
-            Trigger to locate.
+            Hotstring whose semantic trigger is being located.
         container:
-            Text in which to locate it.
-        case_sensitive:
-            Whether exact casing is required.
+            Hotstring whose semantic trigger is being searched.
+        require_exact_case:
+            Whether both definitions require exact casing.
+
+    Yields:
+        Start index of each occurrence in `container.semantic_trigger`.
+    """
+    if require_exact_case:
+        yield from _iter_occurrence_starts(
+            trigger=trigger.semantic_trigger,
+            container=container.semantic_trigger,
+        )
+        return
+
+    trigger_key = trigger.case_insensitive_semantic_trigger_key
+    container_key = container.case_insensitive_semantic_trigger_key
+
+    if (
+        len(trigger_key) == len(trigger.semantic_trigger)
+        and len(container_key) == len(container.semantic_trigger)
+    ):
+        yield from _iter_occurrence_starts(
+            trigger=trigger_key,
+            container=container_key,
+        )
+        return
+
+    trigger_length = len(trigger.semantic_trigger)
+    for start in range(len(container.semantic_trigger) - trigger_length + 1):
+        segment = container.semantic_trigger[start : start + trigger_length]
+        if make_case_insensitive_trigger_key(segment) == trigger_key:
+            yield start
+
+
+def _iter_occurrence_starts(*, trigger: str, container: str) -> Iterator[int]:
+    """Yield every exact string occurrence start, including overlaps.
+
+    Repeated `str.find()` is used instead of a regex lookahead. Advancing the
+    next search by one character, rather than by the matched trigger length,
+    preserves overlapping occurrences such as both `ana` matches in
+    `banana`.
+
+    Args:
+        trigger:
+            Exact string to locate.
+        container:
+            String in which to locate it.
 
     Yields:
         Start index of each occurrence.
     """
-    flags = 0 if case_sensitive else re.IGNORECASE
-    pattern = re.compile(rf"(?={re.escape(trigger)})", flags)
-    for match in pattern.finditer(container):
-        yield match.start()
+    start = container.find(trigger)
+    while start != -1:
+        yield start
+        start = container.find(trigger, start + 1)
 
 
 def _left_boundary_reason(
@@ -463,7 +542,7 @@ def _left_boundary_reason(
 
     Args:
         container:
-            Trigger containing the occurrence.
+            Semantic trigger containing the occurrence.
         start:
             Occurrence start index.
         allow_alphanumeric_predecessor:
@@ -497,7 +576,7 @@ def _right_boundary_reason(
 
     Args:
         container:
-            Trigger containing the occurrence.
+            Semantic trigger containing the occurrence.
         end:
             Exclusive occurrence end index.
         require_ending_character:

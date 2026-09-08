@@ -9,8 +9,7 @@ requires-python = ">=3.12"
 dependencies    = ["multypo>=0.1.1"]
 
 [dependency-groups]
-dev = ["ruff>=0.15.22"]
-
+dev  = ["ruff>=0.15.22"]
 docs = ["mkdocs-material>=9,<10", "mkdocstrings[python]>=1.0.6"]
 
 [tool.uv]
@@ -21,16 +20,15 @@ default-groups = ["dev", "docs"]
 line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "ANN", "B", "C4", "N"]
-
+select = ["ANN", "B", "C4", "E", "F", "I", "N", "UP"]
 ignore = [
-    "E203",
-    "E501",
-    "UP007",
     "ANN201",
     "ANN204",
+    "ANN401",
     "B905",
     "C408",
+    "E203",
+    "E501",
     "N812",
-    "ANN401",
+    "UP007",
 ]
