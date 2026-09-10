@@ -15,18 +15,14 @@ hotstrings and the hotstrings that already exist in AutoCorrect2.
 
 At a high level, the workflow is:
 
-```text
-target words
-    ↓
-generate plausible keyboard typos
-    ↓
-remove ambiguous generated mappings
-    ↓
-compare candidates with existing AutoCorrect2 hotstrings
-    ↓
-retain accepted corrections
-    ↓
-write AutoCorrect2-compatible hotstrings and reports
+```mermaid
+flowchart TD
+    A["Target words"] --> B["Generate plausible<br>keyboard typos"]
+    B --> C["Remove internally<br>ambiguous mappings"]
+    C --> D["Create AutoCorrect2<br>candidates"]
+    D --> E["Check against existing<br>AutoCorrect2 hotstrings"]
+    E --> F["Keep accepted<br>candidates"]
+    F --> G["Optionally write<br>hotstrings and reports"]
 ```
 
 The project is therefore **not an autocorrect runtime of its own**. AutoHotkey
@@ -44,11 +40,8 @@ A hotstring watches typed input for a trigger and reacts when that trigger is
 recognized. A simple hotstring can replace one piece of text with another, while
 an execute hotstring can invoke arbitrary AutoHotkey code.
 
-For example, an autocorrect entry can conceptually represent:
-
-```text
-misspelled trigger → intended word
-```
+In its simplest form, an autocorrect hotstring maps a **misspelled trigger**
+to an **intended word**.
 
 This makes hotstrings a natural foundation for a continuously running
 autocorrect system. AutoHotkey also provides options that change how triggers
@@ -101,14 +94,12 @@ hotstrings produced by this project are intended to operate.
 
 The relationship can be summarized as:
 
-```text
-AutoHotkey
-    ↓
-AutoCorrect.ahk
-    ↓
-AutoCorrect2
-    ↓
-AutoCorrect2 Hotstrings
+```mermaid
+flowchart TD
+    A["AutoHotkey"] -->|"runtime for"| B["AutoCorrect.ahk"]
+    A -->|"runtime for"| C["AutoCorrect2"]
+    B -->|"predecessor of"| C
+    D["AutoCorrect2 Hotstrings<br>(this project)"] -->|"supports"| C
 ```
 
 This project operates at the generation and analysis layer.

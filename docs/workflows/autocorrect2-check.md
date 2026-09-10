@@ -1,21 +1,29 @@
-# AutoCorrect2 check only
+# AutoCorrect2 conflict checking
 
-```text
-manually supplied AutoCorrect2CandidateHotstring objects
-        ↓
-load configured AutoCorrect2 hotstrings
-        ↓
-resolve declaration options against applicable defaults
-        ↓
-generic conflict checking
-        ↓
-AutoCorrect2CheckResult
+Use this workflow when candidate hotstrings already exist and need to be checked
+against the active hotstrings in a configured AutoCorrect2 project.
+
+[`run_autocorrect2_check()`][hotstring.pipeline.run_autocorrect2_check] accepts
+a sequence of
+[`AutoCorrect2CandidateHotstring`][hotstring.autocorrect2.models.AutoCorrect2CandidateHotstring]
+objects:
+
+```mermaid
+flowchart TD
+    A["Supplied candidates"] --> D["Resolve options and<br>assess conflicts"]
+    B["Configured AutoCorrect2<br>source files"] --> C["Load existing<br>hotstrings"]
+    C --> D
+    D --> E["AutoCorrect2CheckResult"]
 ```
 
-Typo generation is not required. Each candidate retains its semantic
-replacement and derives its AutoCorrect2 executable content through the
-concrete candidate subclass.
+Typo generation is not involved. The returned
+[`AutoCorrect2CheckResult`][hotstring.autocorrect2.models.AutoCorrect2CheckResult]
+partitions the supplied candidates into accepted and rejected groups.
+
+Each supplied candidate retains its semantic replacement and derives the
+AutoCorrect2-compatible AutoHotkey content used when it is rendered.
 
 The pipeline can optionally append accepted candidates to the generated include
 file. The AutoCorrect2 writer owns the generated-file location and output
-policy, while generic filesystem operations remain in `hotstring.file_io`.
+policy, while generic filesystem operations remain in
+[`hotstring.file_io`][hotstring.file_io].

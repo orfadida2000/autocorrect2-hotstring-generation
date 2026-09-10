@@ -1,15 +1,23 @@
-# Typo generation only
+# Typo generation
 
-```text
-source words
-  + TypoGenerationConfig
-  + n_workers execution option
-        ↓
-raw MULTYPO samples
-        ↓
-aggregation and internal ambiguity filtering
-        ↓
-TypoGenerationResult
+This standalone workflow generates and filters typo mappings without loading
+AutoCorrect2 data.
+
+[`run_typo_generation()`][hotstring.pipeline.run_typo_generation] accepts source
+words, an ordered sequence of
+[`TypoGenerationTask`][hotstring.typo_generation.models.TypoGenerationTask]
+objects, a
+[`TypoGenerationConfig`][hotstring.typo_generation.models.TypoGenerationConfig],
+and an optional `n_workers` value.
+
+```mermaid
+flowchart TD
+    A["Source words"] --> D["Execute typo-generation<br>tasks"]
+    B["Generation tasks"] --> D
+    C["Configuration<br>and worker count"] --> D
+    D --> E["Raw MULTYPO samples"]
+    E --> F["Aggregate and classify<br>generated mappings"]
+    F --> G["TypoGenerationResult"]
 ```
 
 `TypoGenerationResult.candidates` maps each unambiguous noisy form to exactly

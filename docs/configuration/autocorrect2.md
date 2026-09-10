@@ -11,19 +11,20 @@ it exists.
 
 ## Matching defaults
 
-`HotstringOptions` does not bake AutoHotkey defaults into omitted fields.
-Omitted values remain `InheritedState.INHERIT` until a
-`ResolvedHotstringOptions` is created with the defaults that apply at that
-source position.
+[`HotstringOptions`][hotstring.core.options.HotstringOptions] does not bake
+AutoHotkey defaults into omitted fields. Omitted values remain the `INHERIT`
+member of [`InheritedState`][hotstring.core.options.InheritedState] until a
+[`ResolvedHotstringOptions`][hotstring.core.options.ResolvedHotstringOptions] is
+created with the defaults that apply at that source position.
 
-This design supports multiple default sources cleanly:
+Resolution combines the parsed declaration with the fully resolved defaults
+applicable at that source position:
 
-```text
-per-hotstring declaration
-        ↓ inherit
-positional/default context such as #Hotstring
-        ↓
-fully resolved effective state
+```mermaid
+flowchart TD
+    A["HotstringOptions<br>declaration"] --> C["Resolve inherited<br>fields"]
+    B["Applicable<br>resolved defaults"] --> C
+    C --> D["ResolvedHotstringOptions<br>effective state"]
 ```
 
 Until positional directive analysis is implemented, the AutoCorrect2 pipeline

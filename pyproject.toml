@@ -9,8 +9,13 @@ requires-python = ">=3.12"
 dependencies    = ["multypo>=0.1.1"]
 
 [dependency-groups]
-dev  = ["ruff>=0.15.22"]
-docs = ["mkdocs-material>=9,<10", "mkdocstrings[python]>=1.0.6"]
+dev = ["ruff>=0.15.22"]
+docs = [
+    "mkdocs-git-revision-date-localized-plugin>=1.5,<2",
+    "mkdocs-material>=9,<10",
+    "mkdocs-print-site-plugin>=2.9,<3",
+    "mkdocstrings[python]>=1.0.6",
+]
 
 [tool.uv]
 package        = false

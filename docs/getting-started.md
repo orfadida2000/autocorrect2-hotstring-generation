@@ -11,9 +11,10 @@ uv sync
 
 ## Configure AutoCorrect2
 
-Update `AUTOCORRECT2_PROJECT_DIR` in
-`hotstring/autocorrect2/constants.py`, or pass the AutoCorrect2 project path to
-the relevant pipeline API when supported.
+Update
+[`AUTOCORRECT2_PROJECT_DIR`][hotstring.autocorrect2.constants.AUTOCORRECT2_PROJECT_DIR]
+in `hotstring/autocorrect2/constants.py`, or pass the AutoCorrect2 project path
+to the relevant pipeline API when supported.
 
 Add a one-time `#Include` for `Core/GeneratedHotstrings.ahk` in the same active
 AutoCorrect2 hotstring context as the main autocorrection library. The generated

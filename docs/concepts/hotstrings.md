@@ -5,7 +5,8 @@
 The generic hotstring model keeps trigger **meaning** separate from AutoHotkey
 source spelling.
 
-Each initialized `Hotstring` stores two trigger representations:
+Each initialized [`Hotstring`][hotstring.core.models.Hotstring] stores two
+trigger representations:
 
 - `semantic_trigger` — the actual characters AutoHotkey should recognize;
 - `ahk_trigger` — the deterministic, minimally escaped spelling used when
@@ -15,21 +16,21 @@ The constructor argument `trigger` is an `InitVar`, so it is not retained as a
 third ambiguous representation after initialization.
 
 By default, `Hotstring` and candidate classes interpret constructor `trigger`
-as semantic text. `ExistingHotstring` receives trigger text extracted from an
-AHK source file, so it shadows the class policy
-`TRIGGER_INPUT_IS_AHK_SOURCE = True`. The base `__post_init__()` still owns the
-same resolution algorithm for every subclass:
+as semantic text. [`ExistingHotstring`][hotstring.core.models.ExistingHotstring]
+receives trigger text extracted from an AHK source file, so it shadows the class
+policy `TRIGGER_INPUT_IS_AHK_SOURCE = True`. The base
+[`Hotstring.__post_init__()`][hotstring.core.models.Hotstring.__post_init__]
+still owns the same resolution algorithm for every subclass:
 
-```text
-constructor trigger
-        ↓ interpret according to class policy
-semantic_trigger
-        ↓ semantic_to_ahk_trigger(...)
-ahk_trigger
+```mermaid
+flowchart LR
+    A["Constructor trigger"] -->|"apply class policy"| B["semantic_trigger"]
+    B -->|"encode canonically"| C["ahk_trigger"]
 ```
 
-When `CHECK_TRIGGER_ROUND_TRIP` is enabled, initialization also verifies the
-conversion invariant:
+When
+[`CHECK_TRIGGER_ROUND_TRIP`][hotstring.core.models.CHECK_TRIGGER_ROUND_TRIP] is
+enabled, initialization also verifies the conversion invariant:
 
 ```python
 ahk_to_semantic_trigger(ahk_trigger) == semantic_trigger
@@ -38,14 +39,20 @@ ahk_to_semantic_trigger(ahk_trigger) == semantic_trigger
 This is an internal consistency check. A failure indicates a bug in the
 conversion contract rather than invalid user input.
 
-## Canonical AHK trigger spelling
+## Trigger conversion and canonicalization
 
-`semantic_to_ahk_trigger()` produces one deterministic, minimally escaped AHK
-representation.
+[`semantic_to_ahk_trigger()`][hotstring.core.trigger.semantic_to_ahk_trigger]
+produces one deterministic, minimally escaped AHK representation.
 
-Characters which always require source escaping, such as a literal backtick or
-supported control characters, are escaped unconditionally. Colons and
-semicolons are escaped only when their source context requires it:
+[`ahk_to_semantic_trigger()`][hotstring.core.trigger.ahk_to_semantic_trigger]
+performs the reverse semantic conversion: it interprets an AHK source spelling
+and returns the trigger characters that spelling represents. It may therefore
+accept multiple valid source spellings that have the same semantic result.
+
+During canonical encoding, characters which always require source escaping,
+such as a literal backtick or supported control characters, are escaped
+unconditionally. Colons and semicolons are escaped only when their source
+context requires it:
 
 - `:` is escaped only as needed to prevent an unescaped `::` sequence inside
   the trigger or against the declaration delimiter;
@@ -96,36 +103,41 @@ cache.
 
 ## Hotstring rendering
 
-`Hotstring.render(content=None)` renders the canonical option declaration and
-`ahk_trigger`, never the constructor input.
+[`Hotstring.render(content=None)`][hotstring.core.models.Hotstring.render]
+renders the canonical option declaration and `ahk_trigger`, never the
+constructor input.
 
 `content` means everything emitted after the declaration's second `::`. It is
 therefore intentionally broader than an inline replacement RHS: depending on
 AutoHotkey syntax and options, it may be replacement text, executable content,
 or multiline block content.
 
-The generic `Hotstring.to_ahk_string_literal()` helper separately handles AHK
-double-quoted string syntax. It escapes literal backticks and quotes plus all
-supported AHK control escapes (`r`, `n`, `b`, `t`, `v`, `a`, and `f`). Trigger
-encoding and quoted-string encoding remain separate because their syntax rules
-are different.
+The generic
+[`Hotstring.to_ahk_string_literal()`][hotstring.core.models.Hotstring.to_ahk_string_literal]
+helper separately handles AHK double-quoted string syntax. It escapes literal
+backticks and quotes plus all supported AHK control escapes (`r`, `n`, `b`,
+`t`, `v`, `a`, and `f`). Trigger encoding and quoted-string encoding remain
+separate because their syntax rules are different.
 
 ## Declared option state
 
-`HotstringOptions` represents what is explicitly declared on one hotstring.
-Every omitted option uses the shared sentinel:
+[`HotstringOptions`][hotstring.core.options.HotstringOptions] represents what is
+explicitly declared on one hotstring. Every omitted option uses the shared
+sentinel:
 
 ```python
 InheritedState.INHERIT
 ```
 
 This is distinct from the actual semantic value of the option. For example,
-`CaseMode` contains only real case modes, while inheritance is represented by
-`InheritedState` rather than by a synthetic `CaseMode.INHERIT` member.
+[`CaseMode`][hotstring.core.options.CaseMode] contains only real case modes,
+while inheritance is represented by
+[`InheritedState`][hotstring.core.options.InheritedState] rather than by a
+synthetic `CaseMode.INHERIT` member.
 
-Two-state settings use `SettingState.ENABLED` and `SettingState.DISABLED`.
-The `*` option is exposed semantically as `ending_character_optional`, so its
-mapping is direct:
+Two-state settings use the [`SettingState`][hotstring.core.options.SettingState]
+members `SettingState.ENABLED` and `SettingState.DISABLED`. The `*` option is
+exposed semantically as `ending_character_optional`, so its mapping is direct:
 
 | Declaration | Semantic state           |
 | ----------- | ------------------------ |
@@ -133,17 +145,21 @@ mapping is direct:
 | `*0`        | `SettingState.DISABLED`  |
 | omitted     | `InheritedState.INHERIT` |
 
-`declaration()` serializes the parsed semantic state back to one canonical
-option string. Repeated or contradictory source options therefore collapse to
-the last effective value rather than being reproduced verbatim.
+[`declaration()`][hotstring.core.options.HotstringOptions.declaration]
+serializes the parsed semantic state back to one canonical option string.
+Repeated or contradictory source options therefore collapse to the last
+effective value rather than being reproduced verbatim.
 
 ## Resolved option state
 
-`ResolvedHotstringOptions` is a separate dataclass rather than a subclass of
-`HotstringOptions`. Its fields contain only concrete values; none are typed
-with `InheritedState`.
+[`ResolvedHotstringOptions`][hotstring.core.options.ResolvedHotstringOptions] is
+a separate dataclass rather than a subclass of
+[`HotstringOptions`][hotstring.core.options.HotstringOptions]. Its fields
+contain only concrete values; none are typed with
+[`InheritedState`][hotstring.core.options.InheritedState].
 
-`ResolvedHotstringOptions.from_options()` constructs a resolved object from:
+[`ResolvedHotstringOptions.from_options()`][hotstring.core.options.ResolvedHotstringOptions.from_options]
+constructs a resolved object from:
 
 1. one parsed `HotstringOptions` declaration; and
 2. the fully resolved defaults applicable at that declaration position.
@@ -155,8 +171,8 @@ without making `HotstringOptions` itself aware of file position,
 
 ## Send mode
 
-The declared `SendMode` enum represents the three actual hotstring send-mode
-choices:
+The declared [`SendMode`][hotstring.core.options.SendMode] enum represents the
+three actual hotstring send-mode choices:
 
 ```text
 INPUT
@@ -174,7 +190,8 @@ The declaration mapping is:
 | omitted          | `InheritedState.INHERIT` |
 
 Input mode has two distinct effective fallback behaviors, so the resolved model
-uses a separate four-state enum:
+uses a separate four-state
+[`ResolvedSendMode`][hotstring.core.options.ResolvedSendMode] enum:
 
 ```python
 class ResolvedSendMode(Enum):
@@ -208,19 +225,24 @@ to that default instead.
 
 The generic model hierarchy is:
 
-```text
-Hotstring
-    ↑
-CandidateHotstring                (abstract)
-    ↑
-AutoCorrect2CandidateHotstring    (concrete)
+```mermaid
+classDiagram
+    direction TB
+
+    Hotstring <|-- CandidateHotstring
+    CandidateHotstring <|-- AutoCorrect2CandidateHotstring
+
+    class CandidateHotstring {
+        <<abstract>>
+    }
 ```
 
-`CandidateHotstring` stores the semantic `replacement` and requires a concrete
-subclass to derive the AutoHotkey content corresponding to that replacement.
-The generic public `render()` contract remains inherited from `Hotstring`, so
-the hierarchy does not narrow the method signature.
+[`CandidateHotstring`][hotstring.core.models.CandidateHotstring] stores the
+semantic `replacement` and requires a concrete subclass to derive the
+AutoHotkey content corresponding to that replacement. The public
+[`Hotstring.render()`][hotstring.core.models.Hotstring.render] contract remains
+inherited unchanged, so the hierarchy does not narrow the method signature.
 
-`AutoCorrect2CandidateHotstring` supplies the AutoCorrect2-specific mapping:
-the replacement is converted to a complete escaped AutoHotkey string literal
-and wrapped in `f(...)`.
+[`AutoCorrect2CandidateHotstring`][hotstring.autocorrect2.models.AutoCorrect2CandidateHotstring]
+supplies the AutoCorrect2-specific mapping: the replacement is converted to a
+complete escaped AutoHotkey string literal and wrapped in `f(...)`.

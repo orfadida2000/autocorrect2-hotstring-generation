@@ -20,3 +20,5 @@ Project-level orchestration, reporting, and generic file I/O remain at the
 The processing stages can be used independently. Typo generation does not
 depend on AutoCorrect2, and AutoCorrect2 checking can operate on manually
 constructed candidates.
+
+**License:** This project is licensed under the [MIT License](license.md).
