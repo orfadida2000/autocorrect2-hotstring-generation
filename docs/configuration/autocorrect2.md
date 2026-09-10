@@ -11,10 +11,11 @@ it exists.
 
 ## Matching defaults
 
-`HotstringOptions` does not bake AutoHotkey defaults into omitted fields.
-Omitted values remain `InheritedState.INHERIT` until a
-`ResolvedHotstringOptions` is created with the defaults that apply at that
-source position.
+[`HotstringOptions`][hotstring.core.options.HotstringOptions] does not bake
+AutoHotkey defaults into omitted fields. Omitted values remain the `INHERIT`
+member of [`InheritedState`][hotstring.core.options.InheritedState] until a
+[`ResolvedHotstringOptions`][hotstring.core.options.ResolvedHotstringOptions] is
+created with the defaults that apply at that source position.
 
 This design supports multiple default sources cleanly:
 

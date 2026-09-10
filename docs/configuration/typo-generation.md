@@ -1,6 +1,7 @@
 # Typo-generation configuration
 
-`TypoGenerationConfig` contains generation semantics:
+[`TypoGenerationConfig`][hotstring.typo_generation.models.TypoGenerationConfig]
+contains generation semantics:
 
 - `generation_attempts_per_word`;
 - ordered typo distributions;

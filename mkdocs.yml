@@ -109,8 +109,12 @@ nav:
           - Integration: api/autocorrect2/integration.md
           - Constants: api/autocorrect2/constants.md
 
+not_in_nav: |
+  /license.md
+
 plugins:
   - search
+  - privacy
   - mkdocstrings:
       handlers:
         python:

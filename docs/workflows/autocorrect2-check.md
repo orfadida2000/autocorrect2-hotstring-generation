@@ -18,4 +18,5 @@ concrete candidate subclass.
 
 The pipeline can optionally append accepted candidates to the generated include
 file. The AutoCorrect2 writer owns the generated-file location and output
-policy, while generic filesystem operations remain in `hotstring.file_io`.
+policy, while generic filesystem operations remain in
+[`hotstring.file_io`][hotstring.file_io].

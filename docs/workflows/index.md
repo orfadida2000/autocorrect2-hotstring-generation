@@ -8,5 +8,6 @@ Three public workflows are available:
 
 The full workflow reuses the first two rather than duplicating their logic.
 Typo generation remains independent of AutoCorrect2; the adaptation from a
-noisy-word mapping to `AutoCorrect2CandidateHotstring` belongs to the composed
-pipeline.
+noisy-word mapping to
+[`AutoCorrect2CandidateHotstring`][hotstring.autocorrect2.models.AutoCorrect2CandidateHotstring]
+belongs to the composed pipeline.

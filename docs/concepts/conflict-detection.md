@@ -4,10 +4,12 @@ Conflict checking operates on **semantic trigger text** and **effective
 hotstring matching semantics**, not on AHK source spelling or on whether a
 particular option token happened to be present in the source.
 
-Before matching, a parsed `HotstringOptions` declaration is converted to a
-`ResolvedHotstringOptions` using the defaults that apply at that declaration
-position. Conflict detection then reads only the resolved recognition fields it
-needs.
+Before matching, a parsed
+[`HotstringOptions`][hotstring.core.options.HotstringOptions] declaration is
+converted to a
+[`ResolvedHotstringOptions`][hotstring.core.options.ResolvedHotstringOptions]
+using the defaults that apply at that declaration position. Conflict detection
+then reads only the resolved recognition fields it needs.
 
 ## Matching directions
 
