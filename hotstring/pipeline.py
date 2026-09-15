@@ -14,7 +14,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
-from .autocorrect2.constants import AUTOCORRECT2_PROJECT_DIR
 from .autocorrect2.models import AutoCorrect2CandidateHotstring, AutoCorrect2CheckResult
 from .autocorrect2.source_loading import load_existing_hotstrings
 from .autocorrect2.writer import append_candidates
@@ -120,7 +119,7 @@ def run_typo_generation(
 def run_autocorrect2_check(
     candidates: Sequence[AutoCorrect2CandidateHotstring],
     *,
-    project_dir: Path = AUTOCORRECT2_PROJECT_DIR,
+    project_dir: Path,
     report_path: Path | None = None,
     write_accepted: bool = False,
 ) -> AutoCorrect2CheckResult:
@@ -194,8 +193,8 @@ def run_full_pipeline(
     tasks: Sequence[TypoGenerationTask],
     config: TypoGenerationConfig,
     *,
+    project_dir: Path,
     n_workers: int | None = None,
-    project_dir: Path = AUTOCORRECT2_PROJECT_DIR,
     report_path: Path | None = None,
     write_accepted: bool = False,
     logger: logging.Logger | None = None,
@@ -215,10 +214,10 @@ def run_full_pipeline(
             Ordered typo-generation tasks to execute.
         config:
             Shared MULTYPO generator configuration.
-        n_workers:
-            Optional process-pool size.
         project_dir:
             AutoCorrect2 project directory.
+        n_workers:
+            Optional process-pool size.
         report_path:
             Optional destination for the combined report.
         write_accepted:

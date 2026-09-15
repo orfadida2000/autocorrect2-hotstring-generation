@@ -7,7 +7,7 @@ from pathlib import Path
 
 from ..core.options import SettingState
 from ..file_io import read_text, write_text
-from .constants import AUTOCORRECT2_PROJECT_DIR, GENERATED_HOTSTRINGS_RELATIVE_PATH
+from .constants import GENERATED_HOTSTRINGS_RELATIVE_PATH
 from .models import AutoCorrect2CandidateHotstring
 
 GENERATED_FILE_HEADER = (
@@ -21,7 +21,7 @@ GENERATED_FILE_HEADER = (
 def append_candidates(
     candidates: Sequence[AutoCorrect2CandidateHotstring],
     *,
-    project_dir: Path = AUTOCORRECT2_PROJECT_DIR,
+    project_dir: Path,
     relative_path: Path = GENERATED_HOTSTRINGS_RELATIVE_PATH,
 ) -> Path:
     """Append accepted candidates to the project-owned AutoCorrect2 include.

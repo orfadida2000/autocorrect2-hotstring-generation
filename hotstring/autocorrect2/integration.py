@@ -12,7 +12,6 @@ from hotstring.file_io import read_text, write_text
 
 from .constants import (
     AUTOCORRECT2_MAIN_RELATIVE_PATH,
-    AUTOCORRECT2_PROJECT_DIR,
     AUTOCORRECT_HOTSTRINGS_RELATIVE_PATH,
 )
 
@@ -66,7 +65,7 @@ class _IncludeState:
 def has_custom_hotstring_include(
     custom_file_path: str | Path,
     *,
-    project_dir: str | Path = AUTOCORRECT2_PROJECT_DIR,
+    project_dir: str | Path,
 ) -> bool:
     """Return whether a custom file is included in AutoCorrect2's correction context.
 
@@ -92,15 +91,16 @@ def has_custom_hotstring_include(
         OSError:
             If AutoCorrect2's main source file cannot be read.
     """
-    return _inspect_include_state(
-        Path(custom_file_path), Path(project_dir)
-    ).custom_include_index is not None
+    return (
+        _inspect_include_state(Path(custom_file_path), Path(project_dir)).custom_include_index
+        is not None
+    )
 
 
 def add_custom_hotstring_include(
     custom_file_path: str | Path,
     *,
-    project_dir: str | Path = AUTOCORRECT2_PROJECT_DIR,
+    project_dir: str | Path,
 ) -> bool:
     """Add a custom file to AutoCorrect2's autocorrection context if absent.
 
@@ -155,7 +155,7 @@ def add_custom_hotstring_include(
 def remove_custom_hotstring_include(
     custom_file_path: str | Path,
     *,
-    project_dir: str | Path = AUTOCORRECT2_PROJECT_DIR,
+    project_dir: str | Path,
 ) -> bool:
     """Remove a custom file from AutoCorrect2's autocorrection context if present.
 
@@ -200,21 +200,17 @@ def _inspect_include_state(custom_file_path: Path, project_dir: Path) -> _Includ
     """Read and validate AutoCorrect2's include state for one custom file."""
     source_path = (project_dir / AUTOCORRECT2_MAIN_RELATIVE_PATH).resolve(strict=False)
     if not source_path.is_file():
-        raise FileNotFoundError(
-            f"AutoCorrect2 main source file was not found: {source_path}"
-        )
+        raise FileNotFoundError(f"AutoCorrect2 main source file was not found: {source_path}")
 
     custom_path = _resolve_custom_file_path(custom_file_path, project_dir)
-    built_in_hotstrings_path = (
-        project_dir / AUTOCORRECT_HOTSTRINGS_RELATIVE_PATH
-    ).resolve(strict=False)
+    built_in_hotstrings_path = (project_dir / AUTOCORRECT_HOTSTRINGS_RELATIVE_PATH).resolve(
+        strict=False
+    )
 
     if _same_path(custom_path, source_path):
         raise ValueError("The custom include path cannot refer to AutoCorrect2.ahk itself.")
     if _same_path(custom_path, built_in_hotstrings_path):
-        raise ValueError(
-            "The custom include path cannot refer to AutoCorrectHotstrings.ahk."
-        )
+        raise ValueError("The custom include path cannot refer to AutoCorrectHotstrings.ahk.")
 
     content = read_text(source_path, encoding="utf-8-sig")
     lines = content.splitlines(keepends=True)
@@ -250,9 +246,7 @@ def _inspect_include_state(custom_file_path: Path, project_dir: Path) -> _Includ
         )
 
     custom_include_index = custom_indices[0] if custom_indices else None
-    if custom_include_index is not None and not (
-        hotif_start < custom_include_index < hotif_end
-    ):
+    if custom_include_index is not None and not (hotif_start < custom_include_index < hotif_end):
         raise AutoCorrect2IntegrationError(
             f"The custom file {custom_path} is included outside the expected "
             "#HotIf AutoCorrectionsActivelyRunning() context."
@@ -291,9 +285,7 @@ def _find_autocorrection_hotif(lines: list[str], source_path: Path) -> tuple[int
     )
 
 
-def _find_include_indices(
-    lines: list[str], *, target_path: Path, source_dir: Path
-) -> list[int]:
+def _find_include_indices(lines: list[str], *, target_path: Path, source_dir: Path) -> list[int]:
     """Return line indices whose static include resolves to `target_path`."""
     return [
         index
@@ -329,15 +321,10 @@ def _resolve_custom_file_path(custom_file_path: Path, project_dir: Path) -> Path
     """Resolve a caller-supplied custom path against the AutoCorrect2 project."""
     if not isinstance(custom_file_path, Path):
         raise TypeError(
-            "custom_file_path must be a pathlib.Path, "
-            f"not {type(custom_file_path).__name__}"
+            f"custom_file_path must be a pathlib.Path, not {type(custom_file_path).__name__}"
         )
 
-    path = (
-        custom_file_path
-        if custom_file_path.is_absolute()
-        else project_dir / custom_file_path
-    )
+    path = custom_file_path if custom_file_path.is_absolute() else project_dir / custom_file_path
     return path.resolve(strict=False)
 
 
@@ -350,9 +337,7 @@ def _render_include_path(target_path: Path, source_dir: Path) -> str:
 
     include_path = include_path.replace("/", "\\")
     if '"' in include_path or "\n" in include_path or "\r" in include_path:
-        raise ValueError(
-            f"Custom include path cannot be represented safely: {target_path}"
-        )
+        raise ValueError(f"Custom include path cannot be represented safely: {target_path}")
 
     return include_path
 

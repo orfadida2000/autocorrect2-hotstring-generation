@@ -10,7 +10,6 @@ from typing import Final
 
 from ...core.models import ExistingHotstring
 from ..constants import (
-    AUTOCORRECT2_PROJECT_DIR,
     OPTIONAL_HOTSTRING_SOURCE_RELATIVE_PATHS,
     REQUIRED_HOTSTRING_SOURCE_RELATIVE_PATHS,
 )
@@ -32,7 +31,7 @@ LOGGER: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def load_existing_hotstrings(
-    project_dir: Path = AUTOCORRECT2_PROJECT_DIR,
+    project_dir: Path,
     *,
     required_source_paths: Sequence[Path] = REQUIRED_HOTSTRING_SOURCE_RELATIVE_PATHS,
     optional_source_paths: Sequence[Path] = OPTIONAL_HOTSTRING_SOURCE_RELATIVE_PATHS,
