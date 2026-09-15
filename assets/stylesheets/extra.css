@@ -10,3 +10,18 @@
 .md-typeset code {
   font-variant-ligatures: none;
 }
+
+.md-typeset pre.mermaid {
+  opacity: 0 !important;
+}
+
+.md-header__title-link {
+  display: inline-block;
+  max-width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.copyright-symbol {
+  font-weight: bold;
+}

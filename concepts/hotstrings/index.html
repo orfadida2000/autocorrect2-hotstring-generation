@@ -53,6 +53,10 @@
       
     
     
+      <link rel="stylesheet" href="../../css/print-site.css">
+    
+      <link rel="stylesheet" href="../../css/print-site-material.css">
+    
       <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.d94b3c6e.css">
@@ -528,10 +532,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#canonical-ahk-trigger-spelling" class="md-nav__link">
+  <a href="#trigger-conversion-and-canonicalization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Canonical AHK trigger spelling
+        Trigger conversion and canonicalization
       
     </span>
   </a>
@@ -821,7 +825,7 @@
   <span class="md-ellipsis">
     
   
-    Typo generation only
+    Typo generation
   
 
     
@@ -849,7 +853,7 @@
   <span class="md-ellipsis">
     
   
-    AutoCorrect2 check only
+    AutoCorrect2 conflict checking
   
 
     
@@ -1989,6 +1993,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../print_page/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Print documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -2027,10 +2058,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#canonical-ahk-trigger-spelling" class="md-nav__link">
+  <a href="#trigger-conversion-and-canonicalization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Canonical AHK trigger spelling
+        Trigger conversion and canonicalization
       
     </span>
   </a>
@@ -2169,6 +2200,14 @@
 
   
   
+    
+      
+    
+    <a href="https://github.com/orfadida2000/autocorrect2-hotstring-generation/raw/main/docs/concepts/hotstrings.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
 
 
 <h1 id="hotstrings-and-options">Hotstrings and options<a class="headerlink" href="#hotstrings-and-options" title="Permanent link">&para;</a></h1>
@@ -2200,12 +2239,9 @@ receives trigger text extracted from an AHK source file, so it shadows the class
 policy <code>TRIGGER_INPUT_IS_AHK_SOURCE = True</code>. The base
 <a class="autorefs autorefs-internal" title="__post_init__" href="../../api/core/models/#hotstring.core.models.Hotstring.__post_init__"><code>Hotstring.__post_init__()</code></a>
 still owns the same resolution algorithm for every subclass:</p>
-<div class="highlight"><pre><span></span><code>constructor trigger
-        ↓ interpret according to class policy
-semantic_trigger
-        ↓ semantic_to_ahk_trigger(...)
-ahk_trigger
-</code></pre></div>
+<pre class="mermaid"><code>flowchart LR
+    A["Constructor trigger"] --&gt;|"apply class policy"| B["semantic_trigger"]
+    B --&gt;|"encode canonically"| C["ahk_trigger"]</code></pre>
 <p>When
 <a class="autorefs autorefs-internal" title="CHECK_TRIGGER_ROUND_TRIP
 
@@ -2218,12 +2254,17 @@ enabled, initialization also verifies the conversion invariant:</p>
 </code></pre></div>
 <p>This is an internal consistency check. A failure indicates a bug in the
 conversion contract rather than invalid user input.</p>
-<h2 id="canonical-ahk-trigger-spelling">Canonical AHK trigger spelling<a class="headerlink" href="#canonical-ahk-trigger-spelling" title="Permanent link">&para;</a></h2>
+<h2 id="trigger-conversion-and-canonicalization">Trigger conversion and canonicalization<a class="headerlink" href="#trigger-conversion-and-canonicalization" title="Permanent link">&para;</a></h2>
 <p><a class="autorefs autorefs-internal" title="semantic_to_ahk_trigger" href="../../api/core/trigger/#hotstring.core.trigger.semantic_to_ahk_trigger"><code>semantic_to_ahk_trigger()</code></a>
 produces one deterministic, minimally escaped AHK representation.</p>
-<p>Characters which always require source escaping, such as a literal backtick or
-supported control characters, are escaped unconditionally. Colons and
-semicolons are escaped only when their source context requires it:</p>
+<p><a class="autorefs autorefs-internal" title="ahk_to_semantic_trigger" href="../../api/core/trigger/#hotstring.core.trigger.ahk_to_semantic_trigger"><code>ahk_to_semantic_trigger()</code></a>
+performs the reverse semantic conversion: it interprets an AHK source spelling
+and returns the trigger characters that spelling represents. It may therefore
+accept multiple valid source spellings that have the same semantic result.</p>
+<p>During canonical encoding, characters which always require source escaping,
+such as a literal backtick or supported control characters, are escaped
+unconditionally. Colons and semicolons are escaped only when their source
+context requires it:</p>
 <ul>
 <li><code>:</code> is escaped only as needed to prevent an unescaped <code>::</code> sequence inside
   the trigger or against the declaration delimiter;</li>
@@ -2432,12 +2473,15 @@ already selected <code>SI</code>, <code>SP</code>, or <code>SE</code>, the inher
 to that default instead.</p>
 <h2 id="candidate-hierarchy">Candidate hierarchy<a class="headerlink" href="#candidate-hierarchy" title="Permanent link">&para;</a></h2>
 <p>The generic model hierarchy is:</p>
-<div class="highlight"><pre><span></span><code>Hotstring
-    ↑
-CandidateHotstring                (abstract)
-    ↑
-AutoCorrect2CandidateHotstring    (concrete)
-</code></pre></div>
+<pre class="mermaid"><code>classDiagram
+    direction TB
+
+    Hotstring &lt;|-- CandidateHotstring
+    CandidateHotstring &lt;|-- AutoCorrect2CandidateHotstring
+
+    class CandidateHotstring {
+        &lt;&lt;abstract&gt;&gt;
+    }</code></pre>
 <p><a class="autorefs autorefs-internal" title="CandidateHotstring
 
 
@@ -2463,6 +2507,38 @@ complete escaped AutoHotkey string literal and wrapped in <code>f(...)</code>.</
 
 
 
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2026 03:29:23 UTC">September 10, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 30, 2026 01:30:07 UTC">August 30, 2026</span>
+  </span>
+
+    
+    
+    
+  </aside>
 
 
 
@@ -2533,7 +2609,7 @@ complete escaped AutoHotkey string literal and wrapped in <code>f(...)</code>.</
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Or Fadida
+      Copyright <span class="copyright-symbol">&copy;</span> 2026 <a href="https://github.com/orfadida2000">Or Fadida</a>
     </div>
   
   
@@ -2580,10 +2656,14 @@ complete escaped AutoHotkey string literal and wrapped in <code>f(...)</code>.</
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.top", "navigation.tracking", "navigation.path", "navigation.footer", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.top", "navigation.tracking", "navigation.path", "navigation.footer", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.action.view", "content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../js/print-site.js"></script>
+      
+        <script src="../../assets/scripts/header-title-link.js"></script>
       
     
   </body>

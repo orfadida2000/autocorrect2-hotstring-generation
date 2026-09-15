@@ -53,6 +53,10 @@
       
     
     
+      <link rel="stylesheet" href="../css/print-site.css">
+    
+      <link rel="stylesheet" href="../css/print-site-material.css">
+    
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css2.d94b3c6e.css">
@@ -808,7 +812,7 @@
   <span class="md-ellipsis">
     
   
-    Typo generation only
+    Typo generation
   
 
     
@@ -836,7 +840,7 @@
   <span class="md-ellipsis">
     
   
-    AutoCorrect2 check only
+    AutoCorrect2 conflict checking
   
 
     
@@ -1976,6 +1980,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../print_page/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Print documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -2105,6 +2136,14 @@
 
   
   
+    
+      
+    
+    <a href="https://github.com/orfadida2000/autocorrect2-hotstring-generation/raw/main/docs/project-background.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
 
 
 <h1 id="project-background">Project Background<a class="headerlink" href="#project-background" title="Permanent link">&para;</a></h1>
@@ -2119,18 +2158,13 @@ autocorrect library grows: a generated correction must not merely look
 plausible. Its trigger also needs to behave safely alongside other generated
 hotstrings and the hotstrings that already exist in AutoCorrect2.</p>
 <p>At a high level, the workflow is:</p>
-<div class="highlight"><pre><span></span><code>target words
-    ↓
-generate plausible keyboard typos
-    ↓
-remove ambiguous generated mappings
-    ↓
-compare candidates with existing AutoCorrect2 hotstrings
-    ↓
-retain accepted corrections
-    ↓
-write AutoCorrect2-compatible hotstrings and reports
-</code></pre></div>
+<pre class="mermaid"><code>flowchart TD
+    A["Target words"] --&gt; B["Generate plausible&lt;br&gt;keyboard typos"]
+    B --&gt; C["Remove internally&lt;br&gt;ambiguous mappings"]
+    C --&gt; D["Create AutoCorrect2&lt;br&gt;candidates"]
+    D --&gt; E["Check against existing&lt;br&gt;AutoCorrect2 hotstrings"]
+    E --&gt; F["Keep accepted&lt;br&gt;candidates"]
+    F --&gt; G["Optionally write&lt;br&gt;hotstrings and reports"]</code></pre>
 <p>The project is therefore <strong>not an autocorrect runtime of its own</strong>. AutoHotkey
 and AutoCorrect2 remain responsible for recognizing and executing hotstrings.
 This project provides generation, analysis, validation, and integration tooling
@@ -2142,9 +2176,8 @@ language. One of its core text-automation features is the
 <p>A hotstring watches typed input for a trigger and reacts when that trigger is
 recognized. A simple hotstring can replace one piece of text with another, while
 an execute hotstring can invoke arbitrary AutoHotkey code.</p>
-<p>For example, an autocorrect entry can conceptually represent:</p>
-<div class="highlight"><pre><span></span><code>misspelled trigger → intended word
-</code></pre></div>
+<p>In its simplest form, an autocorrect hotstring maps a <strong>misspelled trigger</strong>
+to an <strong>intended word</strong>.</p>
 <p>This makes hotstrings a natural foundation for a continuously running
 autocorrect system. AutoHotkey also provides options that change how triggers
 are recognized, including case sensitivity, whether an ending character is
@@ -2182,14 +2215,11 @@ hotstrings.</p>
 hotstrings produced by this project are intended to operate.</p>
 <h2 id="where-this-project-fits">Where this project fits<a class="headerlink" href="#where-this-project-fits" title="Permanent link">&para;</a></h2>
 <p>The relationship can be summarized as:</p>
-<div class="highlight"><pre><span></span><code>AutoHotkey
-    ↓
-AutoCorrect.ahk
-    ↓
-AutoCorrect2
-    ↓
-AutoCorrect2 Hotstrings
-</code></pre></div>
+<pre class="mermaid"><code>flowchart TD
+    A["AutoHotkey"] --&gt;|"runtime for"| B["AutoCorrect.ahk"]
+    A --&gt;|"runtime for"| C["AutoCorrect2"]
+    B --&gt;|"predecessor of"| C
+    D["AutoCorrect2 Hotstrings&lt;br&gt;(this project)"] --&gt;|"supports"| C</code></pre>
 <p>This project operates at the generation and analysis layer.</p>
 <p>Given target words, it can generate typo candidates that mimic plausible
 keyboard mistakes. Those candidates are then filtered before integration:</p>
@@ -2226,6 +2256,38 @@ the final decision.</p>
 
 
 
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2026 03:29:23 UTC">September 10, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2026 14:07:22 UTC">September 8, 2026</span>
+  </span>
+
+    
+    
+    
+  </aside>
 
 
 
@@ -2296,7 +2358,7 @@ the final decision.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Or Fadida
+      Copyright <span class="copyright-symbol">&copy;</span> 2026 <a href="https://github.com/orfadida2000">Or Fadida</a>
     </div>
   
   
@@ -2343,10 +2405,14 @@ the final decision.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.top", "navigation.tracking", "navigation.path", "navigation.footer", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "navigation.top", "navigation.tracking", "navigation.path", "navigation.footer", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.action.view", "content.code.copy", "content.code.select", "content.code.annotate", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../js/print-site.js"></script>
+      
+        <script src="../assets/scripts/header-title-link.js"></script>
       
     
   </body>
