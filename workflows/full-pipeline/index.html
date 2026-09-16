@@ -9,6 +9,8 @@
         <meta name="description" content="Generate typo-based AutoHotkey hotstrings and validate them against AutoCorrect2">
       
       
+        <meta name="author" content="Or Fadida">
+      
       
         <link rel="canonical" href="https://orfadida2000.github.io/autocorrect2-hotstring-generation/workflows/full-pipeline/">
       
@@ -37,6 +39,31 @@
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
+  
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+  
+  <style>:root{--md-admonition-icon--example:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M3%203h6v4H3zm12%207h6v4h-6zm0%207h6v4h-6zm-2-4H7v5h6v2H5V9h2v2h6z%22/%3E%3C/svg%3E');--md-admonition-icon--abstract:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M9%202v6h2v3H5c-1.11%200-2%20.89-2%202v3H1v6h6v-6H5v-3h6v3H9v6h6v-6h-2v-3h6v3h-2v6h6v-6h-2v-3c0-1.11-.89-2-2-2h-6V8h2V2z%22/%3E%3C/svg%3E');--md-admonition-icon--note:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M19.5%2017c-.13%200-.26%200-.39.04l-1.61-3.25a2.5%202.5%200%200%200-1.75-4.29c-.13%200-.25%200-.39.04l-1.63-3.25c.48-.45.77-1.08.77-1.79a2.5%202.5%200%200%200-5%200c0%20.71.29%201.34.76%201.79L8.64%209.54c-.14-.04-.26-.04-.39-.04a2.5%202.5%200%200%200-1.75%204.29l-1.61%203.25C4.76%2017%204.63%2017%204.5%2017a2.5%202.5%200%200%200%200%205A2.5%202.5%200%200%200%207%2019.5c0-.7-.29-1.34-.76-1.79l1.62-3.25c.14.04.26.04.39.04s.25%200%20.39-.04l1.63%203.25c-.47.45-.77%201.09-.77%201.79a2.5%202.5%200%200%200%205%200A2.5%202.5%200%200%200%2012%2017c-.13%200-.26%200-.39.04L10%2013.79c.46-.45.75-1.08.75-1.79s-.29-1.34-.75-1.79l1.61-3.25c.13.04.26.04.39.04s.26%200%20.39-.04L14%2010.21c-.45.45-.75%201.09-.75%201.79a2.5%202.5%200%200%200%202.5%202.5c.13%200%20.25%200%20.39-.04l1.63%203.25c-.47.45-.77%201.09-.77%201.79a2.5%202.5%200%200%200%205%200%202.5%202.5%200%200%200-2.5-2.5%22/%3E%3C/svg%3E');--md-admonition-icon--info:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M22%205H4V2H2v20h20v-2H4V9c4.09%200%206.13%202%208.29%204.21S17.09%2018%2022%2018v-2c-4.09%200-6.13-2-8.29-4.21S8.91%207%204%207h18Z%22/%3E%3C/svg%3E');}</style>
+
 
 
     
@@ -357,6 +384,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../command-line/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../project-structure/" class="md-nav__link">
         
   
@@ -411,7 +465,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -433,14 +487,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -607,7 +661,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -629,14 +683,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -664,6 +718,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full pipeline
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -680,6 +752,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command-line usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -787,6 +889,10 @@
     
       
         
+          
+        
+      
+        
       
         
       
@@ -803,11 +909,12 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
-            
+          <div class="md-nav__link md-nav__container">
+            <a href="../../configuration/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -821,11 +928,17 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -834,6 +947,8 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
             
               
                 
@@ -925,6 +1040,8 @@
       
         
       
+        
+      
     
     
     
@@ -938,7 +1055,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -960,14 +1077,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="">
+              <label class="md-nav__link " for="__nav_9" id="__nav_9_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1012,7 +1129,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_2" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1034,14 +1151,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1235,6 +1352,198 @@
   
   
   
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/cli/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_9_4" id="__nav_9_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CLI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/cli/application/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/cli/parser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parser
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/cli/runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Runtime configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/cli/commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command execution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../../api/report/" class="md-nav__link">
         
@@ -1344,7 +1653,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_8" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1366,14 +1675,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_8_7" id="__nav_8_7_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_9_8" id="__nav_9_8_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1538,7 +1847,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_9" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1560,14 +1869,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_8_8" id="__nav_8_8_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_9_9" id="__nav_9_9_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1636,7 +1945,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_8_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9_9_3" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -1658,14 +1967,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_8_8_3" id="__nav_8_8_3_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_9_9_3" id="__nav_9_9_3_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_8_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_9_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_9_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1915,6 +2224,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#command-line-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command-line usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1999,6 +2327,8 @@ returns a <a class="autorefs autorefs-internal" title="FullPipelineResult
   
       dataclass
   " href="../../api/pipeline/#hotstring.pipeline.FullPipelineResult"><code>FullPipelineResult</code></a>:</p>
+<details class="info" open="open">
+<summary>Full Pipeline Workflow</summary>
 <pre class="mermaid"><code>flowchart TD
     A["Source words and&lt;br&gt;generation settings"] --&gt; B["Generate typo&lt;br&gt;mappings"]
     B --&gt; C["TypoGenerationResult"]
@@ -2007,6 +2337,7 @@ returns a <a class="autorefs autorefs-internal" title="FullPipelineResult
     E --&gt; F["AutoCorrect2CheckResult"]
     C --&gt; G["FullPipelineResult"]
     F --&gt; G</code></pre>
+</details>
 <p>The adaptation step converts each surviving noisy-to-target mapping into an
 <a class="autorefs autorefs-internal" title="AutoCorrect2CandidateHotstring
 
@@ -2024,6 +2355,22 @@ dependency on
   " href="../../api/core/options/#hotstring.core.options.HotstringOptions"><code>HotstringOptions</code></a> or AutoCorrect2.</p>
 <p>The full pipeline disables stage-specific report writing while composing the
 two stages and creates one combined report at the end when requested.</p>
+<h2 id="command-line-usage">Command-line usage<a class="headerlink" href="#command-line-usage" title="Permanent link">&para;</a></h2>
+<p>Run the composed workflow with <code>full-pipeline</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">full-pipeline</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-words</span><span class="o">-file</span> <span class="p">.\</span><span class="n">words</span><span class="p">.</span><span class="n">txt</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-single-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-min-length</span> <span class="n">5</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-workers</span> <span class="n">4</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-report</span> <span class="p">.\</span><span class="n">reports</span><span class="p">\</span><span class="n">full-pipeline</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div>
+<p>The AutoCorrect2 project directory is resolved from <code>--project-dir</code>, the
+process environment, an explicit dotenv file, or the project-root <code>.env</code>.</p>
+<p>The command remains read-only unless <code>--write-accepted</code> is supplied. It does
+not accept manually supplied candidates because it creates <code>B0X</code> candidates
+from the typo-generation result.</p>
+<p><strong>See also:</strong> <a href="../../command-line/">Command-line interface</a> for all shared options.</p>
 
 
 
@@ -2046,7 +2393,7 @@ two stages and creates one combined report at the end when requested.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2026 03:29:23 UTC">September 10, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 13:41:18 UTC">September 16, 2026</span>
   </span>
 
     

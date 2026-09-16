@@ -12,9 +12,13 @@
         <meta name="author" content="Or Fadida">
       
       
-        <link rel="canonical" href="https://orfadida2000.github.io/autocorrect2-hotstring-generation/license/">
+        <link rel="canonical" href="https://orfadida2000.github.io/autocorrect2-hotstring-generation/command-line/">
       
       
+        <link rel="prev" href="../getting-started/">
+      
+      
+        <link rel="next" href="../project-structure/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>License - AutoCorrect2 Hotstrings</title>
+        <title>Command-line interface - AutoCorrect2 Hotstrings</title>
       
     
     
@@ -116,6 +120,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#command-line-usage" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -147,7 +156,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              License
+              Command-line interface
             
           </span>
         </div>
@@ -372,10 +381,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../command-line/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-line interface
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -391,6 +427,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#logging-verbosity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging verbosity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typo-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typo generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autocorrect2-project-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AutoCorrect2 project directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autocorrect2-conflict-checking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AutoCorrect2 conflict checking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reports-and-generated-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reports and generated output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit statuses
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2152,6 +2285,93 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#logging-verbosity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging verbosity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typo-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typo generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autocorrect2-project-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AutoCorrect2 project directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autocorrect2-conflict-checking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AutoCorrect2 conflict checking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reports-and-generated-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reports and generated output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-statuses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit statuses
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -2180,32 +2400,279 @@
     
       
     
-    <a href="https://github.com/orfadida2000/autocorrect2-hotstring-generation/raw/main/docs/license.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/orfadida2000/autocorrect2-hotstring-generation/raw/main/docs/command-line.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-  <h1>License</h1>
+<h1 id="command-line-usage">Command-line usage<a class="headerlink" href="#command-line-usage" title="Permanent link">&para;</a></h1>
+<p>The <code>hotstring.__main__</code> module provides the <code>python -m hotstring</code> entry point and delegates
+command-line execution to <a class="autorefs autorefs-internal" title="main" href="../api/cli/application/#hotstring.cli.application.main"><code>main()</code></a> which exposes the project's three
+public workflows as subcommands.</p>
+<table>
+<thead>
+<tr>
+<th>Subcommand</th>
+<th>Workflow</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>typo-generation</code></td>
+<td>Generate typo mappings and remove internally ambiguous mappings</td>
+</tr>
+<tr>
+<td><code>autocorrect2-check</code></td>
+<td>Check supplied candidates against existing AutoCorrect2 hotstrings</td>
+</tr>
+<tr>
+<td><code>full-pipeline</code></td>
+<td>Generate typo candidates and check the survivors against AutoCorrect2</td>
+</tr>
+</tbody>
+</table>
+<p>Display the top-level help or the help for one subcommand with:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="p">-</span><span class="n">-help</span>
+<span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">typo-generation</span> <span class="p">-</span><span class="n">-help</span>
+<span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">autocorrect2-check</span> <span class="p">-</span><span class="n">-help</span>
+<span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">full-pipeline</span> <span class="p">-</span><span class="n">-help</span>
+</code></pre></div>
+<h2 id="logging-verbosity">Logging verbosity<a class="headerlink" href="#logging-verbosity" title="Permanent link">&para;</a></h2>
+<p><code>-v</code> and <code>--verbose</code> are repeatable top-level options:</p>
+<table>
+<thead>
+<tr>
+<th>Invocation</th>
+<th>Logging level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no verbosity option</td>
+<td>Normal command summaries and concise errors</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>Informational logging</td>
+</tr>
+<tr>
+<td><code>-vv</code></td>
+<td>Debug logging, including a traceback for an unexpected runtime failure</td>
+</tr>
+</tbody>
+</table>
+<p>The verbosity option belongs to the top-level parser, so it must appear before
+the subcommand:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">-v</span> <span class="n">typo-generation</span> <span class="p">...</span>
+<span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">-vv</span> <span class="n">full-pipeline</span> <span class="p">...</span>
+</code></pre></div>
+<p>Repeating <code>-v</code> more than twice continues to use debug logging.</p>
+<h2 id="typo-generation">Typo generation<a class="headerlink" href="#typo-generation" title="Permanent link">&para;</a></h2>
+<p><code>typo-generation</code> requires exactly one source of words:</p>
+<ul>
+<li>repeat <code>--word WORD</code> to supply words directly; or</li>
+<li>use <code>--words-file PATH</code> for a UTF-8 file containing one word per line.</li>
+</ul>
+<p>Blank lines are ignored, and duplicate words are removed while preserving
+their first occurrence.</p>
+<p>The command creates the project's default ordered
+<a class="autorefs autorefs-internal" title="TypoGenerationTask
 
-<p>MIT License</p>
-<p>Copyright (c) [2026] [Or Fadida]</p>
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
-<p>The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</p>
+
+  
+      dataclass
+  " href="../api/typo-generation/models/#hotstring.typo_generation.models.TypoGenerationTask"><code>TypoGenerationTask</code></a>
+sequence from these required arguments:</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--single-attempts COUNT</code></td>
+<td>Attempts per eligible word for each forced single-error task</td>
+</tr>
+<tr>
+<td><code>--multi-attempts COUNT</code></td>
+<td>Attempts per eligible word for the mixed two-error task</td>
+</tr>
+<tr>
+<td><code>--multi-min-length LENGTH</code></td>
+<td>Minimum word length for the mixed two-error task</td>
+</tr>
+</tbody>
+</table>
+<p>Optional generation arguments are:</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--language LANGUAGE</code></td>
+<td>MULTYPO language identifier; defaults to <code>english</code></td>
+</tr>
+<tr>
+<td><code>--excluding-set</code> / <code>--no-excluding-set</code></td>
+<td>Enable or disable MULTYPO's language excluding set; enabled by default</td>
+</tr>
+<tr>
+<td><code>--keyboard-weights HORIZONTAL VERTICAL</code></td>
+<td>Relative keyboard-neighbor weights; defaults to <code>9 1</code></td>
+</tr>
+<tr>
+<td><code>--workers COUNT</code></td>
+<td>Process-pool size; omit it to use the execution layer's default</td>
+</tr>
+<tr>
+<td><code>--report PATH</code></td>
+<td>Write a typo-generation report</td>
+</tr>
+</tbody>
+</table>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">typo-generation</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-words</span><span class="o">-file</span> <span class="p">.\</span><span class="n">words</span><span class="p">.</span><span class="n">txt</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-single-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-min-length</span> <span class="n">5</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-workers</span> <span class="n">4</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-report</span> <span class="p">.\</span><span class="n">reports</span><span class="p">\</span><span class="n">typo-generation</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div>
+<p>This subcommand does not load or modify an AutoCorrect2 project.</p>
+<h2 id="autocorrect2-project-directory">AutoCorrect2 project directory<a class="headerlink" href="#autocorrect2-project-directory" title="Permanent link">&para;</a></h2>
+<p>The <code>autocorrect2-check</code> and <code>full-pipeline</code> subcommands resolve the local
+AutoCorrect2 project directory in this order:</p>
+<ol>
+<li><code>--project-dir PATH</code>;</li>
+<li>the process environment variable <code>AUTOCORRECT2_PROJECT_DIR</code>;</li>
+<li>the dotenv file selected by <code>--env-file PATH</code>;</li>
+<li><code>.env</code> at the project root.</li>
+</ol>
+<p>Resolution stops at the first configured source. A lower-priority dotenv file
+is therefore not opened or validated after a command-line or process-environment
+value has been selected.</p>
+<p>A project-root <code>.env</code> file can contain:</p>
+<div class="highlight"><pre><span></span><code>AUTOCORRECT2_PROJECT_DIR=H:/Projects/AutoCorrect2
+</code></pre></div>
+<p>An explicit dotenv file uses the same key:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">autocorrect2-check</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.\</span><span class="n">config</span><span class="p">\</span><span class="n">autocorrect2</span><span class="p">.</span><span class="n">env</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-candidate</span> <span class="s2">"teh"</span> <span class="s2">"the"</span> <span class="s2">"B0X"</span>
+</code></pre></div>
+<p>A relative value read from a dotenv file is resolved relative to that file's
+directory. A relative <code>--project-dir</code> value or process-environment value is
+resolved relative to the current working directory.</p>
+<p>See <a href="../configuration/autocorrect2/">AutoCorrect2 configuration</a> for the
+required source-file layout and generated-file policy.</p>
+<h2 id="autocorrect2-conflict-checking">AutoCorrect2 conflict checking<a class="headerlink" href="#autocorrect2-conflict-checking" title="Permanent link">&para;</a></h2>
+<p><code>autocorrect2-check</code> accepts manually supplied
+<a class="autorefs autorefs-internal" title="AutoCorrect2CandidateHotstring
+
+
+  
+      dataclass
+  " href="../api/autocorrect2/models/#hotstring.autocorrect2.models.AutoCorrect2CandidateHotstring"><code>AutoCorrect2CandidateHotstring</code></a>
+objects without running typo generation.</p>
+<p>Supply candidates directly by repeating <code>--candidate</code> with three values:</p>
+<div class="highlight"><pre><span></span><code>--candidate TRIGGER REPLACEMENT OPTIONS
+</code></pre></div>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">autocorrect2-check</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-candidate</span> <span class="s2">"teh"</span> <span class="s2">"the"</span> <span class="s2">"B0X"</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-candidate</span> <span class="s2">"adn"</span> <span class="s2">"and"</span> <span class="s2">"B0X"</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-project-dir</span> <span class="s2">"H:\Projects\AutoCorrect2"</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-report</span> <span class="p">.\</span><span class="n">reports</span><span class="p">\</span><span class="n">autocorrect2-check</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div>
+<p>Alternatively, <code>--candidates-file PATH</code> accepts a UTF-8 JSON file containing a
+top-level array. Every object must contain exactly the string fields <code>trigger</code>,
+<code>replacement</code>, and <code>options</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"trigger"</span><span class="p">:</span><span class="w"> </span><span class="s2">"teh"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"replacement"</span><span class="p">:</span><span class="w"> </span><span class="s2">"the"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="s2">"B0X"</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"trigger"</span><span class="p">:</span><span class="w"> </span><span class="s2">"adn"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"replacement"</span><span class="p">:</span><span class="w"> </span><span class="s2">"and"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="s2">"B0X"</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+</code></pre></div>
+<p>Use the file with:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">autocorrect2-check</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-candidates</span><span class="o">-file</span> <span class="p">.\</span><span class="n">candidates</span><span class="p">.</span><span class="n">json</span>
+</code></pre></div>
+<p><code>--candidate</code> and <code>--candidates-file</code> are mutually exclusive.</p>
+<h2 id="full-pipeline">Full pipeline<a class="headerlink" href="#full-pipeline" title="Permanent link">&para;</a></h2>
+<p><code>full-pipeline</code> composes typo generation and AutoCorrect2 conflict checking.
+It accepts the same word and generation arguments as <code>typo-generation</code>, then
+converts the surviving mappings into generated <code>B0X</code> candidates before running
+the AutoCorrect2 check.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">full-pipeline</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-words</span><span class="o">-file</span> <span class="p">.\</span><span class="n">words</span><span class="p">.</span><span class="n">txt</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-single-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-min-length</span> <span class="n">5</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-workers</span> <span class="n">4</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-report</span> <span class="p">.\</span><span class="n">reports</span><span class="p">\</span><span class="n">full-pipeline</span><span class="p">.</span><span class="n">txt</span>
+</code></pre></div>
+<p>The project directory can come from any of the four configuration sources
+described above. <code>full-pipeline</code> does not accept <code>--candidate</code> or
+<code>--candidates-file</code>, because it creates candidates from the typo-generation
+result.</p>
+<h2 id="reports-and-generated-output">Reports and generated output<a class="headerlink" href="#reports-and-generated-output" title="Permanent link">&para;</a></h2>
+<p>All three subcommands accept <code>--report PATH</code>. Parent directories are created by
+the reporting layer when required.</p>
+<p>AutoCorrect2-aware commands are read-only by default. Supply
+<code>--write-accepted</code> to append accepted candidates to
+<code>Core/GeneratedHotstrings.ahk</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-m</span> <span class="n">hotstring</span> <span class="n">full-pipeline</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-words</span><span class="o">-file</span> <span class="p">.\</span><span class="n">words</span><span class="p">.</span><span class="n">txt</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-single-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-attempts</span> <span class="n">100</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-multi-min-length</span> <span class="n">5</span> <span class="p">`</span>
+    <span class="p">-</span><span class="n">-write-accepted</span>
+</code></pre></div>
+<p>Writing manually supplied candidates remains subject to the writer's explicit
+generated-option contract.</p>
+<h2 id="exit-statuses">Exit statuses<a class="headerlink" href="#exit-statuses" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>The selected workflow completed successfully</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Pipeline execution failed</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>Command-line syntax or resolved runtime configuration was invalid</td>
+</tr>
+<tr>
+<td><code>130</code></td>
+<td>Execution was interrupted from the terminal</td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -2228,7 +2695,7 @@ SOFTWARE.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2026 03:29:23 UTC">September 10, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 13:41:18 UTC">September 16, 2026</span>
   </span>
 
     
@@ -2238,7 +2705,7 @@ SOFTWARE.</p>
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 30, 2026 01:30:07 UTC">August 30, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 13:41:18 UTC">September 16, 2026</span>
   </span>
 
     
@@ -2270,6 +2737,44 @@ SOFTWARE.</p>
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../getting-started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting started">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Getting started
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../project-structure/" class="md-footer__link md-footer__link--next" aria-label="Next: Project structure">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Project structure
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

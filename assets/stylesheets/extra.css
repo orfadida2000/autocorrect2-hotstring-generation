@@ -3,6 +3,34 @@
   --md-code-font: "JetBrains Mono", monospace;
 }
 
+/* Color design tokens */
+:root,
+[data-md-color-scheme="default"] {
+  --md-admonition-icon--project-tree: #546e7a;
+  --md-admonition-bg--project-tree: rgba(84, 110, 122, 0.05);
+  --md-admonition-header--project-tree: rgba(84, 110, 122, 0.1);
+}
+
+/* 1. Container Rules */
+.md-typeset .admonition.project-tree,
+.md-typeset details.project-tree {
+  border-left-color: var(--md-admonition-icon--project-tree);
+  background-color: var(--md-admonition-bg--project-tree);
+}
+
+/* 2. Header / Title Rules */
+.md-typeset .project-tree > .admonition-title,
+.md-typeset .project-tree > summary {
+  color: var(--md-admonition-icon--project-tree);
+  background-color: var(--md-admonition-header--project-tree);
+}
+
+/* 3. Icon Mask Injection */
+.md-typeset .project-tree > .admonition-title::before,
+.md-typeset .project-tree > summary::before {
+  background-color: var(--md-admonition-icon--project-tree);
+}
+
 .md-typeset table:not([class]) {
   font-size: 0.72rem;
 }
