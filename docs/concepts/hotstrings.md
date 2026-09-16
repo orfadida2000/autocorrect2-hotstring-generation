@@ -225,17 +225,19 @@ to that default instead.
 
 The generic model hierarchy is:
 
-```mermaid
-classDiagram
-    direction TB
+???+ abstract "Candidate hotstring class hierarchy"
 
-    Hotstring <|-- CandidateHotstring
-    CandidateHotstring <|-- AutoCorrect2CandidateHotstring
+    ```mermaid
+    classDiagram
+        direction TB
 
-    class CandidateHotstring {
-        <<abstract>>
-    }
-```
+        Hotstring <|-- CandidateHotstring
+        CandidateHotstring <|-- AutoCorrect2CandidateHotstring
+
+        class CandidateHotstring {
+            <<abstract>>
+        }
+    ```
 
 [`CandidateHotstring`][hotstring.core.models.CandidateHotstring] stores the
 semantic `replacement` and requires a concrete subclass to derive the

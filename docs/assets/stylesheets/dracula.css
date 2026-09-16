@@ -30,7 +30,7 @@
   --md-typeset-kbd-color: #44475a;
   --md-typeset-kbd-border-color: #6272a4;
   --md-typeset-kbd-accent-color: #282a36;
-  --md-typeset-mark-color: rgba(241, 250, 140, 0.20);
+  --md-typeset-mark-color: rgba(241, 250, 140, 0.2);
   --md-typeset-table-color: #44475a;
   --md-typeset-table-color--light: rgba(68, 71, 90, 0.35);
 
@@ -38,7 +38,7 @@
   --md-code-fg-color: #f8f8f2;
   --md-code-bg-color: #1f2029;
   --md-code-hl-color: rgba(189, 147, 249, 0.16);
-  --md-code-hl-color--light: rgba(189, 147, 249, 0.10);
+  --md-code-hl-color--light: rgba(189, 147, 249, 0.1);
 
   /* Syntax highlighting */
   --md-code-hl-number-color: #bd93f9;
@@ -66,15 +66,9 @@
   --md-footer-bg-color--dark: #191a21;
 
   /* Shadows */
-  --md-shadow-z1:
-    0 0.2rem 0.5rem rgba(25, 26, 33, 0.18),
-    0 0 0.05rem rgba(25, 26, 33, 0.35);
-  --md-shadow-z2:
-    0 0.2rem 0.5rem rgba(25, 26, 33, 0.28),
-    0 0 0.05rem rgba(25, 26, 33, 0.45);
-  --md-shadow-z3:
-    0 0.2rem 0.5rem rgba(25, 26, 33, 0.38),
-    0 0 0.05rem rgba(25, 26, 33, 0.55);
+  --md-shadow-z1: 0 0.2rem 0.5rem rgba(25, 26, 33, 0.18), 0 0 0.05rem rgba(25, 26, 33, 0.35);
+  --md-shadow-z2: 0 0.2rem 0.5rem rgba(25, 26, 33, 0.28), 0 0 0.05rem rgba(25, 26, 33, 0.45);
+  --md-shadow-z3: 0 0.2rem 0.5rem rgba(25, 26, 33, 0.38), 0 0 0.05rem rgba(25, 26, 33, 0.55);
 }
 
 /* Header and tabs */
@@ -93,7 +87,6 @@
 [data-md-color-scheme="dracula"] .md-nav__link--active {
   color: #ff79c6;
 }
-
 
 /* Search field */
 [data-md-color-scheme="dracula"] .md-search__form {
@@ -125,6 +118,146 @@
 
 /* Text selection */
 [data-md-color-scheme="dracula"] ::selection {
-  background-color: rgba(189, 147, 249, 0.30);
+  background-color: rgba(189, 147, 249, 0.3);
   color: #ffffff;
+}
+
+/* -----------------------------------------------------------
+   Dracula Admonition Theme Overrides (All 12 Types)
+----------------------------------------------------------- */
+
+/* 1. CYAN (#8be9fd) -> note, abstract, info */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.note,
+[data-md-color-scheme="dracula"] .md-typeset details.note,
+[data-md-color-scheme="dracula"] .md-typeset .admonition.abstract,
+[data-md-color-scheme="dracula"] .md-typeset details.abstract,
+[data-md-color-scheme="dracula"] .md-typeset .admonition.info,
+[data-md-color-scheme="dracula"] .md-typeset details.info {
+  border-color: #8be9fd;
+}
+[data-md-color-scheme="dracula"] .md-typeset .note > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .note > summary,
+[data-md-color-scheme="dracula"] .md-typeset .abstract > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .abstract > summary,
+[data-md-color-scheme="dracula"] .md-typeset .info > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .info > summary {
+  background-color: rgba(139, 233, 253, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .note > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .note > summary::before,
+[data-md-color-scheme="dracula"] .md-typeset .abstract > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .abstract > summary::before,
+[data-md-color-scheme="dracula"] .md-typeset .info > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .info > summary::before {
+  background-color: #8be9fd;
+}
+
+/* 2. GREEN (#50fa7b) -> tip, success */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.tip,
+[data-md-color-scheme="dracula"] .md-typeset details.tip,
+[data-md-color-scheme="dracula"] .md-typeset .admonition.success,
+[data-md-color-scheme="dracula"] .md-typeset details.success {
+  border-color: #50fa7b;
+}
+[data-md-color-scheme="dracula"] .md-typeset .tip > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .tip > summary,
+[data-md-color-scheme="dracula"] .md-typeset .success > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .success > summary {
+  background-color: rgba(80, 250, 123, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .tip > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .tip > summary::before,
+[data-md-color-scheme="dracula"] .md-typeset .success > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .success > summary::before {
+  background-color: #50fa7b;
+}
+
+/* 3. YELLOW (#f1fa8c) -> question */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.question,
+[data-md-color-scheme="dracula"] .md-typeset details.question {
+  border-color: #f1fa8c;
+}
+[data-md-color-scheme="dracula"] .md-typeset .question > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .question > summary {
+  background-color: rgba(241, 250, 140, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .question > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .question > summary::before {
+  background-color: #f1fa8c;
+}
+
+/* 4. ORANGE (#ffb86c) -> warning */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.warning,
+[data-md-color-scheme="dracula"] .md-typeset details.warning {
+  border-color: #ffb86c;
+}
+[data-md-color-scheme="dracula"] .md-typeset .warning > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .warning > summary {
+  background-color: rgba(255, 184, 108, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .warning > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .warning > summary::before {
+  background-color: #ffb86c;
+}
+
+/* 5. RED (#ff5555) -> failure, danger */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.failure,
+[data-md-color-scheme="dracula"] .md-typeset details.failure,
+[data-md-color-scheme="dracula"] .md-typeset .admonition.danger,
+[data-md-color-scheme="dracula"] .md-typeset details.danger {
+  border-color: #ff5555;
+}
+[data-md-color-scheme="dracula"] .md-typeset .failure > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .failure > summary,
+[data-md-color-scheme="dracula"] .md-typeset .danger > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .danger > summary {
+  background-color: rgba(255, 85, 85, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .failure > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .failure > summary::before,
+[data-md-color-scheme="dracula"] .md-typeset .danger > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .danger > summary::before {
+  background-color: #ff5555;
+}
+
+/* 6. PINK (#ff79c6) -> bug */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.bug,
+[data-md-color-scheme="dracula"] .md-typeset details.bug {
+  border-color: #ff79c6;
+}
+[data-md-color-scheme="dracula"] .md-typeset .bug > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .bug > summary {
+  background-color: rgba(255, 121, 198, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .bug > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .bug > summary::before {
+  background-color: #ff79c6;
+}
+
+/* 7. PURPLE (#bd93f9) -> example (Your custom File Tree) */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.example,
+[data-md-color-scheme="dracula"] .md-typeset details.example {
+  border-color: #bd93f9;
+}
+[data-md-color-scheme="dracula"] .md-typeset .example > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .example > summary {
+  background-color: rgba(189, 147, 249, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .example > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .example > summary::before {
+  background-color: #bd93f9;
+}
+
+/* 8. COMMENT GREY (#6272a4) -> quote */
+[data-md-color-scheme="dracula"] .md-typeset .admonition.quote,
+[data-md-color-scheme="dracula"] .md-typeset details.quote {
+  border-color: #6272a4;
+}
+[data-md-color-scheme="dracula"] .md-typeset .quote > .admonition-title,
+[data-md-color-scheme="dracula"] .md-typeset .quote > summary {
+  background-color: rgba(98, 114, 164, 0.1);
+}
+[data-md-color-scheme="dracula"] .md-typeset .quote > .admonition-title::before,
+[data-md-color-scheme="dracula"] .md-typeset .quote > summary::before {
+  background-color: #6272a4;
 }

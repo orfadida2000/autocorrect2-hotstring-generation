@@ -6,7 +6,10 @@ authors         = [{ name = "Or Fadida", email = "or@fadida.net" }]
 license         = { file = "LICENSE" }
 readme          = "README.md"
 requires-python = ">=3.12"
-dependencies    = ["multypo>=0.1.1"]
+dependencies    = [
+    "multypo>=0.1.1",
+    "python-dotenv>=1.2.3",
+]
 
 [dependency-groups]
 dev = ["ruff>=0.15.22"]

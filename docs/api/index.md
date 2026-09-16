@@ -7,6 +7,8 @@ from source docstrings with mkdocstrings.
 - `hotstring.autocorrect2` contains AutoCorrect2-specific integration, including
   the nested `source_loading` subpackage.
 - `hotstring.typo_generation` contains typo-generation functionality.
+- `hotstring.cli` contains command-line parsing, runtime configuration, and
+  pipeline dispatch.
 - Top-level `hotstring` modules such as `pipeline`, `report`, and `file_io` are
   documented directly under this API section.
 

@@ -13,6 +13,7 @@
     "multypo",
     "punkt",
     "ucrtbase",
-    "wcslwr"
+    "wcslwr",
+    "dotenv"
   ]
 }

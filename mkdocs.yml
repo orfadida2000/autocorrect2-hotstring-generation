@@ -1,16 +1,34 @@
+# Identity & Ownership
 site_name: AutoCorrect2 Hotstrings
-site_url: https://orfadida2000.github.io/autocorrect2-hotstring-generation/
 site_description: Generate typo-based AutoHotkey hotstrings and validate them against AutoCorrect2
+site_author: Or Fadida
+copyright: 'Copyright <span class="copyright-symbol">&copy;</span> 2026 <a href="https://github.com/orfadida2000">Or Fadida</a>'
+site_url: https://orfadida2000.github.io/autocorrect2-hotstring-generation/
 
+# Repository
 repo_name: orfadida2000/autocorrect2-hotstring-generation
 repo_url: https://github.com/orfadida2000/autocorrect2-hotstring-generation
 edit_uri: edit/main/docs/
 
+# Build, Server & Deployment
+docs_dir: docs
+site_dir: site
+dev_addr: 127.0.0.1:8000
+remote_branch: gh-pages
+remote_name: origin
+
+# Theme & Appearance
 theme:
   name: material
 
   logo: assets/icons/autocorrect2-spellcheck.svg
   favicon: assets/icons/ACicon.ico
+  icon:
+    admonition:
+      example: material/file-tree # For physical directories
+      abstract: material/sitemap # For strict OOP/hierarchies
+      note: material/graph # For conceptual networks/dependencies
+      info: material/chart-sankey # For sequential processes/pipelines
 
   palette:
     - media: "(prefers-color-scheme: light)"
@@ -50,10 +68,12 @@ theme:
     text: Inter
     code: JetBrains Mono
 
+# Navigation
 nav:
   - Home: index.md
   - Project Background: project-background.md
   - Getting started: getting-started.md
+  - Command-line interface: command-line.md
   - Project structure: project-structure.md
 
   - Concepts:
@@ -71,6 +91,7 @@ nav:
       - Reporting: workflows/reporting.md
 
   - Configuration:
+      - Overview: configuration/index.md
       - Typo generation: configuration/typo-generation.md
       - AutoCorrect2: configuration/autocorrect2.md
 
@@ -86,6 +107,14 @@ nav:
           - Constants: api/core/constants.md
 
       - Pipelines: api/pipeline.md
+
+      - CLI:
+          - Overview: api/cli/index.md
+          - Application: api/cli/application.md
+          - Parser: api/cli/parser.md
+          - Runtime configuration: api/cli/runtime.md
+          - Command execution: api/cli/commands.md
+
       - Reports: api/report.md
       - File I/O: api/file-io.md
       - Constants: api/constants.md
@@ -114,6 +143,7 @@ nav:
 not_in_nav: |
   /license.md
 
+# Plugins & Extensions
 plugins:
   - search
   - privacy
@@ -163,9 +193,13 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - toc:
       permalink: true
 
+# CSS & JS assets
 extra_css:
   - https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap
   - assets/stylesheets/extra.css
@@ -176,8 +210,7 @@ extra_css:
 extra_javascript:
   - assets/scripts/header-title-link.js
 
-copyright: 'Copyright <span class="copyright-symbol">&copy;</span> 2026 <a href="https://github.com/orfadida2000">Or Fadida</a>'
-
+# Extra Configuration
 extra:
   social:
     - icon: fontawesome/brands/github

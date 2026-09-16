@@ -1,0 +1,3 @@
+# Application
+
+::: hotstring.cli.application

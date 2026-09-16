@@ -10,6 +10,11 @@ wheels/
 # Virtual environments
 .venv
 
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
 # Logs
 *.log
 logs/

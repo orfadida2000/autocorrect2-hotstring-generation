@@ -15,15 +15,17 @@ hotstrings and the hotstrings that already exist in AutoCorrect2.
 
 At a high level, the workflow is:
 
-```mermaid
-flowchart TD
-    A["Target words"] --> B["Generate plausible<br>keyboard typos"]
-    B --> C["Remove internally<br>ambiguous mappings"]
-    C --> D["Create AutoCorrect2<br>candidates"]
-    D --> E["Check against existing<br>AutoCorrect2 hotstrings"]
-    E --> F["Keep accepted<br>candidates"]
-    F --> G["Optionally write<br>hotstrings and reports"]
-```
+???+ info "Workflow Diagram"
+
+    ```mermaid
+    flowchart TD
+        A["Target words"] --> B["Generate plausible<br>keyboard typos"]
+        B --> C["Remove internally<br>ambiguous mappings"]
+        C --> D["Create AutoCorrect2<br>candidates"]
+        D --> E["Check against existing<br>AutoCorrect2 hotstrings"]
+        E --> F["Keep accepted<br>candidates"]
+        F --> G["Optionally write<br>hotstrings and reports"]
+    ```
 
 The project is therefore **not an autocorrect runtime of its own**. AutoHotkey
 and AutoCorrect2 remain responsible for recognizing and executing hotstrings.
@@ -94,13 +96,15 @@ hotstrings produced by this project are intended to operate.
 
 The relationship can be summarized as:
 
-```mermaid
-flowchart TD
-    A["AutoHotkey"] -->|"runtime for"| B["AutoCorrect.ahk"]
-    A -->|"runtime for"| C["AutoCorrect2"]
-    B -->|"predecessor of"| C
-    D["AutoCorrect2 Hotstrings<br>(this project)"] -->|"supports"| C
-```
+???+ note "Relationship Diagram"
+
+    ```mermaid
+    flowchart TD
+        A["AutoHotkey"] -->|"runtime for"| B["AutoCorrect.ahk"]
+        A -->|"runtime for"| C["AutoCorrect2"]
+        B -->|"predecessor of"| C
+        D["AutoCorrect2 Hotstrings<br>(this project)"] -->|"supports"| C
+    ```
 
 This project operates at the generation and analysis layer.
 
